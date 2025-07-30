@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9KJKTKFB4P"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-9KJKTKFB4P");
+    </script>
+    <meta charset="UTF-8" />
+    <title>搜尋結果</title>
+    <link rel="icon" href="../asset/icon.jpg" type="image/jpg" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      .container {
+        max-width: 960px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+        min-height: calc(100vh - 40px);
+        box-sizing: border-box;
+      }
+
+      /* Images */
+      .side-image {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: -1;
+        opacity: 0.3;
+        max-height: 80vh;
+        width: auto;
+      }
+      .side-image.left {
+        left: 20px;
+      }
+      .side-image.right {
+        right: 20px;
+      }
+      @media (max-width: 1200px) {
+        .side-image {
+          opacity: 0.15;
+        }
+      }
+      @media (max-width: 992px) {
+        .side-image {
+          display: none;
+        }
+      }
+
+      /* Buttons */
+      .back-to-prev-button {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 0.9em;
+        z-index: 10;
+      }
+      .back-to-prev-button:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+      }
+      .back-to-prev-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .top-right-buttons {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        display: flex;
+        gap: 10px;
+      }
+      .action-button {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 0.9em;
+      }
+      .action-button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+      }
+      .action-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Search Specific Styles */
+      #search-input-container {
+        margin-top: 50px; /* Space for top buttons */
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      #search-input {
+        width: 80%;
+        max-width: 500px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Video List Styles */
+      #video-list {
+        /* No longer a direct grid, content is grouped within */
+        padding: 20px 0;
+      }
+      .video-group {
+        margin-bottom: 30px;
+      }
+      .video-group h2 {
+        color: #34495e;
+        margin-top: 25px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #eee; /* Stronger border for categories */
+      }
+      .video-group h3 {
+        color: #2980b9;
+        margin-top: 15px;
+        padding-bottom: 3px;
+        border-bottom: 1px solid #eee; /* Lighter border for sub-categories */
+      }
+      .video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+        padding-top: 10px;
+      }
+
+      .video-item {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.2s ease-in-out;
+      }
+      .video-item:hover {
+        transform: translateY(-5px);
+      }
+      .video-item a {
+        display: block;
+        padding-bottom: 10px;
+        color: inherit;
+        text-decoration: none;
+      }
+      .video-item img {
+        max-width: 100%;
+        height: auto;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 10px;
+      }
+      .video-item .video-title {
+        font-weight: bold;
+        padding: 0 10px;
+        margin-bottom: 5px;
+        color: #333;
+      }
+      .video-item .video-meta {
+        font-size: 0.85em;
+        color: #777;
+        padding: 0 10px;
+        margin-top: -3px;
+        margin-bottom: 5px;
+      }
+      .video-item .video-date {
+        font-size: 0.9em;
+        color: #666;
+        padding: 0 10px;
+      }
+      .video-item .video-tags {
+        padding: 5px 10px 10px;
+        font-size: 0.8em;
+        color: #555;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+      }
+      .video-item .video-tags span {
+        background-color: #e0e0e0;
+        padding: 3px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .video-item .video-tags span:hover {
+        background-color: #c0c0c0;
+      }
+
+      /* Footer styles */
+      .footer-info {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 60px); /* Adjust width to fit container padding */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8em;
+        color: #777;
+      }
+      .developer-info {
+        flex-grow: 1;
+        text-align: right;
+      }
+      .last-update-info {
+        flex-grow: 1;
+        text-align: left;
+      }
+      .developer-info a,
+      .last-update-info a {
+        color: #777;
+        text-decoration: underline;
+        font-weight: normal;
+      }
+      .developer-info a:hover,
+      .last-update-info a:hover {
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <img
+      src="../asset/left_image.png"
+      alt="Left Decor Image"
+      class="side-image left"
+    />
+    <img
+      src="../asset/right_image.png"
+      alt="Right Decor Image"
+      class="side-image right"
+    />
+
+    <div class="container">
+      <a href="../index.html" class="back-to-prev-button">← 回首頁</a>
+
+      <div class="top-right-buttons"></div>
+
+      <div id="search-input-container">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="輸入直播標題關鍵字搜尋..."
+        />
+      </div>
+
+      <div
+        id="search-results-info"
+        style="text-align: center; margin-bottom: 20px; color: #555"
+      ></div>
+
+      <div id="video-list"></div>
+
+      <div class="footer-info">
+        <div id="last-update-info" class="last-update-info">
+          最後更新日期: 載入中...
+        </div>
+        <div class="developer-info">
+          開發者:
+          <a href="https://github.com/Hung-Liang" target="_blank">Hung-Liang</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("search-input");
+        const videoListContainer = document.getElementById("video-list");
+        const searchResultsInfo = document.getElementById(
+          "search-results-info"
+        );
+        const lastUpdateInfo = document.getElementById("last-update-info");
+
+        let allVideosIndexData = [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialSearchTerm = urlParams.get("query") || "";
+        const initialTagSearch = urlParams.get("tag") || ""; // Get tag from URL
+
+        // Set search input value based on initial search term or tag
+        if (initialTagSearch) {
+          searchInput.value = `#${initialTagSearch}`;
+        } else if (initialSearchTerm) {
+          searchInput.value = initialSearchTerm;
+        }
+
+        // Load last update date
+        fetch("../data/last_update.json")
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+          })
+          .then((data) => {
+            if (data && data.last_update) {
+              lastUpdateInfo.textContent = `最後更新日期: ${data.last_update}`;
+            } else {
+              lastUpdateInfo.textContent = "最後更新日期: 無法載入";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching last_update.json:", error);
+            lastUpdateInfo.textContent = "最後更新日期: 載入失敗";
+          });
+
+        function getCategoryDisplayName(category) {
+          if (category === "videos") {
+            return "直播回放";
+          }
+          return "";
+        }
+
+        function getSubCategoryDisplayName(subCategory) {
+          if (subCategory === "normal") {
+            return "一般直播";
+          } else if (subCategory === "member") {
+            return "會限";
+          }
+          return "";
+        }
+
+        // Function to render a single video item
+        function renderVideoItem(video) {
+          const div = document.createElement("div");
+          div.className = "video-item";
+          const youtubeUrl = `https://www.youtube.com/watch?v=${video.videoId}`;
+
+          let tagsHtml = "";
+          if (video.tags && video.tags.length > 0) {
+            tagsHtml =
+              `<div class="video-tags">` +
+              video.tags
+                .map(
+                  (tag) =>
+                    `<span data-tag="${String(
+                      tag
+                    ).toLowerCase()}">${tag}</span>`
+                )
+                .join("") +
+              `</div>`;
+          }
+
+          div.innerHTML = `
+            <a href="${youtubeUrl}" target="_blank">
+              <img src="${video.thumbnail}" alt="${video.title}" width="320">
+              <p class="video-title">${video.title}</p>
+              <p class="video-meta">
+                (${video.year}年${video.month}月)
+              </p>
+              <p class="video-date">${new Date(
+                video.publishedAt
+              ).toLocaleDateString()}</p>
+            </a>
+            ${tagsHtml}
+          `;
+          return div;
+        }
+
+        function renderSearchResults(results) {
+          videoListContainer.innerHTML = "";
+
+          if (results.length === 0) {
+            videoListContainer.innerHTML =
+              "<p style='text-align: center; margin-top: 50px;'>沒有找到符合條件的直播。</p>";
+            searchResultsInfo.textContent = `共找到 0 筆結果。`;
+            return;
+          }
+
+          const groupedVideos = {};
+          results.forEach((video) => {
+            const category = video.category;
+            const subCategory = video.subCategory;
+
+            if (!groupedVideos[category]) {
+              groupedVideos[category] = {};
+            }
+            if (!groupedVideos[category][subCategory]) {
+              groupedVideos[category][subCategory] = [];
+            }
+            groupedVideos[category][subCategory].push(video);
+          });
+
+          const orderedCategories = ["videos"];
+          const orderedSubCategories = ["normal", "member"];
+
+          let totalDisplayedVideos = 0;
+
+          orderedCategories.forEach((categoryKey) => {
+            if (groupedVideos[categoryKey]) {
+              const categoryDiv = document.createElement("div");
+              categoryDiv.className = "video-group";
+
+              const categoryTitle = document.createElement("h2");
+              categoryTitle.textContent = getCategoryDisplayName(categoryKey);
+              categoryDiv.appendChild(categoryTitle);
+
+              orderedSubCategories.forEach((subCategoryKey) => {
+                if (groupedVideos[categoryKey][subCategoryKey]) {
+                  const subCategoryDiv = document.createElement("div");
+                  subCategoryDiv.className = "video-subgroup";
+
+                  const subCategoryTitle = document.createElement("h3");
+                  subCategoryTitle.textContent =
+                    getSubCategoryDisplayName(subCategoryKey);
+                  subCategoryDiv.appendChild(subCategoryTitle);
+
+                  const videoGrid = document.createElement("div");
+                  videoGrid.className = "video-grid";
+
+                  groupedVideos[categoryKey][subCategoryKey].forEach(
+                    (video) => {
+                      videoGrid.appendChild(renderVideoItem(video));
+                      totalDisplayedVideos++;
+                    }
+                  );
+                  subCategoryDiv.appendChild(videoGrid);
+                  categoryDiv.appendChild(subCategoryDiv);
+                }
+              });
+              videoListContainer.appendChild(categoryDiv);
+            }
+          });
+
+          searchResultsInfo.textContent = `共找到 ${totalDisplayedVideos} 筆結果。`;
+        }
+
+        function performSearch() {
+          const query = searchInput.value.toLowerCase().trim();
+          if (query === "") {
+            renderSearchResults([]);
+            searchResultsInfo.textContent = "請輸入關鍵字開始搜尋...";
+            return;
+          }
+
+          // If the query starts with '#', treat it as a tag search
+          if (query.startsWith("#")) {
+            const tagString = query.substring(1).trim(); // Remove '#' and trim
+            // Split by one or more spaces, and then for each part, remove any leading '#' and convert to lowercase
+            const searchTags = tagString
+              .split(/\s+/)
+              .filter((t) => t !== "")
+              .map((t) => {
+                return t.startsWith("#")
+                  ? t.substring(1).toLowerCase()
+                  : t.toLowerCase();
+              });
+
+            if (searchTags.length === 0) {
+              renderSearchResults([]);
+              searchResultsInfo.textContent = "請輸入有效的標籤關鍵字。";
+              return;
+            }
+
+            const filteredResults = allVideosIndexData.filter((video) => {
+              // Ensure video.tags exists and is an array
+              if (!video.tags || !Array.isArray(video.tags)) {
+                return false;
+              }
+              // Convert video's tags to lowercase for case-insensitive comparison
+              const lowerCaseVideoTags = video.tags.map((tag) =>
+                String(tag).toLowerCase()
+              );
+              // Check if all searchTags (which are already lowercase) are included in lowerCaseVideoTags
+              return searchTags.every((searchTag) =>
+                lowerCaseVideoTags.includes(searchTag)
+              );
+            });
+
+            renderSearchResults(filteredResults);
+            const tagsDisplay = searchTags.map((tag) => `"${tag}"`).join(", ");
+            searchResultsInfo.textContent = `共找到 ${filteredResults.length} 筆包含標籤 ${tagsDisplay} 的結果。`;
+          } else {
+            // Otherwise, perform a title search
+            const filteredResults = allVideosIndexData.filter((video) => {
+              const titleMatches = video.title.toLowerCase().includes(query);
+
+              // Check if any of the video's tags contain the query
+              const tagsMatch =
+                video.tags && Array.isArray(video.tags)
+                  ? video.tags.some((tag) =>
+                      String(tag).toLowerCase().includes(query)
+                    )
+                  : false;
+
+              return titleMatches || tagsMatch; // Return true if title OR tags match
+            });
+            renderSearchResults(filteredResults);
+            searchResultsInfo.textContent = `共找到 ${filteredResults.length} 筆結果。`;
+          }
+        }
+
+        // Event delegation for tag clicks on videoListContainer
+        videoListContainer.addEventListener("click", (event) => {
+          const target = event.target;
+          // Check if the clicked element is a tag span
+          if (target.matches(".video-tags span")) {
+            event.preventDefault(); // Prevent default link behavior
+            event.stopPropagation(); // Stop event bubbling
+            const tag = target.dataset.tag; // This tag is already lowercase from renderVideoItem
+            // Redirect to search_results.html with the tag as a query parameter
+            // For multiple tags, we'll just pass the single clicked tag.
+            // User can then manually add more tags in the search bar if needed.
+            window.location.href = `./search_results.html?tag=${encodeURIComponent(
+              tag
+            )}`;
+          }
+        });
+
+        // Fetch all videos index data
+        fetch("../data/all_videos_index.json")
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(
+                `HTTP error! status: ${res.status} for ${res.url}`
+              );
+            }
+            return res.json();
+          })
+          .then((data) => {
+            allVideosIndexData = data;
+            // Perform search based on initial query or tag
+            // The performSearch function now handles both single and multiple tags
+            if (initialTagSearch || initialSearchTerm) {
+              performSearch();
+            } else {
+              // Otherwise, prompt user to search
+              searchResultsInfo.textContent = "請輸入關鍵字開始搜尋...";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching all_videos_index.json:", error);
+            videoListContainer.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;'>無法載入搜尋資料，請稍後再試。</p><p style='text-align: center; color: red;'>錯誤: ${error.message}</p>`;
+          });
+
+        searchInput.addEventListener("input", performSearch);
+      });
+    </script>
+  </body>
+</html>

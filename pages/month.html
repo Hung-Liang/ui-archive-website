@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9KJKTKFB4P"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-9KJKTKFB4P");
+    </script>
+    <meta charset="UTF-8" />
+    <title>該月直播</title>
+    <link rel="icon" href="../asset/icon.jpg" type="image/jpg" />
+    <style>
+      /* 這裡可以放 month.html 獨有的 CSS 樣式，
+         render.js 會注入共用的樣式 */
+    </style>
+  </head>
+  <body>
+    <img
+      src="../asset/left_image.png"
+      alt="Left Decor Image"
+      class="side-image left"
+    />
+    <img
+      src="../asset/right_image.png"
+      alt="Right Decor Image"
+      class="side-image right"
+    />
+
+    <div class="container">
+      <a href="javascript:history.back()" class="back-to-prev-button"
+        >← 回上一頁</a
+      >
+
+      <div class="top-right-buttons">
+        <a href="../index.html" class="action-button">回首頁</a>
+      </div>
+
+      <div id="video-list"></div>
+
+      <div class="footer-info">
+        <div id="last-update-info" class="last-update-info">
+          最後更新日期: 載入中...
+        </div>
+        <div class="developer-info">
+          開發者:
+          <a href="https://github.com/Hung-Liang" target="_blank">Hung-Liang</a>
+        </div>
+      </div>
+    </div>
+
+    <script src="../scripts/render.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const lastUpdateInfo = document.getElementById("last-update-info");
+
+        // 載入最後更新日期
+        fetch("../data/last_update.json")
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+          })
+          .then((data) => {
+            if (data && data.last_update) {
+              lastUpdateInfo.textContent = `最後更新日期: ${data.last_update}`;
+            } else {
+              lastUpdateInfo.textContent = "最後更新日期: 無法載入";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching last_update.json:", error);
+            lastUpdateInfo.textContent = "最後更新日期: 載入失敗";
+          });
+      });
+    </script>
+  </body>
+</html>

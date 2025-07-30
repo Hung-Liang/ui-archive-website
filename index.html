@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-9KJKTKFB4P"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-9KJKTKFB4P");
+    </script>
+    <meta charset="UTF-8" />
+    <title>しぐれういYoutube回顧</title>
+    <link rel="icon" href="./asset/icon.jpg" type="image/jpg" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative; /* For positioning absolute elements inside */
+        min-height: calc(
+          100vh - 40px
+        ); /* Ensure container is tall enough for footer positioning */
+        box-sizing: border-box; /* Include padding in height calculation */
+      }
+      h1 {
+        color: #2c3e50;
+        text-align: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+      h2 {
+        /* Category titles like "宅宅軍團長直播回放" */
+        color: #34495e;
+        margin-top: 25px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #eee;
+      }
+      h3 {
+        /* Sub-category titles like "一般直播", "會限" */
+        color: #2980b9;
+        margin-top: 15px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+        display: flex; /* Make months horizontal */
+        flex-wrap: wrap; /* Allow wrapping */
+        gap: 10px; /* Space between months */
+      }
+      li {
+        background-color: #ecf0f1;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 8px 12px;
+        transition: background-color 0.3s ease;
+      }
+      li:hover {
+        background-color: #dbe3e7;
+      }
+      a {
+        text-decoration: none;
+        color: #2c3e50;
+        font-weight: bold;
+      }
+      a:hover {
+        color: #3498db;
+      }
+
+      /* Styles for top-right and bottom-right elements */
+      .top-right-buttons {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        display: flex;
+        gap: 10px;
+      }
+      .action-button {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 0.9em; /* Smaller font for buttons */
+      }
+      .action-button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+      }
+      .action-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Search Button Specific Styles */
+      .search-button {
+        background-color: #f0ad4e; /* 橘色系 */
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+      }
+      .search-button:hover {
+        background-color: #ec971f;
+        transform: translateY(-2px);
+      }
+      .search-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .search-button .icon {
+        font-size: 1.2em; /* 放大鏡圖示大小 */
+      }
+      /* Search Input Pop-up Styles */
+      #search-popup-overlay {
+        display: none; /* Hidden by default */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 100;
+        justify-content: center;
+        align-items: center;
+      }
+      #search-popup-content {
+        background: #fff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+        position: relative;
+      }
+      #search-popup-content input {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+      #search-popup-content button {
+        padding: 10px 20px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      #search-popup-content button:hover {
+        background-color: #2980b9;
+      }
+      #close-search-popup {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #aaa;
+      }
+      #close-search-popup:hover {
+        color: #333;
+      }
+
+      /* Footer styles */
+      .footer-info {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 60px); /* Adjust width to fit container padding */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8em;
+        color: #777;
+      }
+      .developer-info {
+        flex-grow: 1;
+        text-align: right; /* Changed from left to right */
+      }
+      .last-update-info {
+        flex-grow: 1;
+        text-align: left; /* Changed from center to left */
+      }
+      .developer-info a,
+      .last-update-info a {
+        color: #777;
+        text-decoration: underline;
+        font-weight: normal;
+      }
+      .developer-info a:hover,
+      .last-update-info a:hover {
+        color: #333;
+      }
+
+      /* New styles for left and right images */
+      .side-image {
+        position: fixed; /* Fixed position relative to viewport */
+        top: 50%; /* Center vertically */
+        transform: translateY(-50%); /* Adjust for vertical centering */
+        z-index: -1; /* Send behind other content */
+        opacity: 0.3; /* Make them semi-transparent */
+        max-height: 80vh; /* Limit height for responsiveness */
+        width: auto; /* Maintain aspect ratio */
+      }
+      .side-image.left {
+        left: 20px; /* Position from left */
+      }
+      .side-image.right {
+        right: 20px; /* Position from right */
+      }
+
+      /* Responsive adjustments for smaller screens */
+      @media (max-width: 1200px) {
+        .side-image {
+          opacity: 0.15; /* Make them even more transparent on smaller screens */
+        }
+      }
+
+      @media (max-width: 992px) {
+        .side-image {
+          display: none; /* Hide images completely on very small screens to save space */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <img
+      src="./asset/left_image.png"
+      alt="Left Decor Image"
+      class="side-image left"
+    />
+    <img
+      src="./asset/right_image.png"
+      alt="Right Decor Image"
+      class="side-image right"
+    />
+
+    <div class="container">
+      <div class="top-right-buttons">
+        <button id="open-search-popup" class="search-button">
+          <span class="icon">🔍</span> 搜尋直播
+        </button>
+        <a href="index.html" class="action-button">回首頁</a>
+      </div>
+
+      <h1>しぐれうい</h1>
+      <div id="list"></div>
+
+      <div class="footer-info">
+        <div id="last-update-info" class="last-update-info">
+          最後更新日期: 載入中...
+        </div>
+        <div class="developer-info">
+          開發者:
+          <a href="https://github.com/Hung-Liang" target="_blank">Hung-Liang</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="search-popup-overlay">
+      <div id="search-popup-content">
+        <span id="close-search-popup">×</span>
+        <h2>搜尋直播</h2>
+        <input
+          type="text"
+          id="popup-search-input"
+          placeholder="請輸入直播標題關鍵字"
+        />
+        <button id="perform-search-button">開始搜尋</button>
+      </div>
+    </div>
+
+    <script>
+      fetch("data/index.json")
+        .then((res) => res.json())
+        .then((index) => {
+          const container = document.getElementById("list");
+
+          // Define the desired order of categories (Life first, then Gaming)
+          const orderedCategories = ["videos"];
+
+          // Iterate through categories in the specified order
+          orderedCategories.forEach((category) => {
+            // Check if the category actually exists in the index data
+            if (!index[category]) {
+              return; // Skip if category data is missing
+            }
+
+            const categoryTitle = document.createElement("h2");
+            // Set category title based on category key
+            if (category === "videos") {
+              categoryTitle.textContent = "直播回放";
+            } else {
+              categoryTitle.textContent = `${
+                category.charAt(0).toUpperCase() + category.slice(1)
+              }`; // Fallback for other categories
+            }
+            container.appendChild(categoryTitle);
+
+            // Define the desired order of sub-categories (Normal first, then Member)
+            const orderedSubCategories = ["normal", "member"];
+
+            // Iterate through sub-categories in the specified order
+            orderedSubCategories.forEach((sub_category) => {
+              // Check if the sub_category actually exists under the current category
+              if (!index[category][sub_category]) {
+                return; // Skip if sub_category data is missing
+              }
+
+              const subCategoryTitle = document.createElement("h3");
+              // Set sub-category title based on sub_category key
+              if (sub_category === "normal") {
+                subCategoryTitle.textContent = "一般直播";
+              } else if (sub_category === "member") {
+                subCategoryTitle.textContent = "會限";
+              } else {
+                subCategoryTitle.textContent = `${
+                  sub_category.charAt(0).toUpperCase() + sub_category.slice(1)
+                }`; // Fallback
+              }
+              container.appendChild(subCategoryTitle);
+
+              const yearsData = index[category][sub_category];
+              const years = Object.keys(yearsData).sort((a, b) => b - a); // Sort years descending
+
+              years.forEach((year) => {
+                const yearText = document.createElement("p"); // Use p tag for year for now, can be h4
+                yearText.textContent = `${year} 年`;
+                yearText.style.fontWeight = "bold";
+                yearText.style.marginTop = "10px";
+                container.appendChild(yearText);
+
+                const ul = document.createElement("ul");
+                yearsData[year]
+                  .sort((a, b) => b - a) // Sort months descending
+                  .forEach((month) => {
+                    const li = document.createElement("li");
+                    // Link to month.html, passing category and sub_category
+                    li.innerHTML = `<a href="./pages/month.html?cat=${category}&sub=${sub_category}&y=${year}&m=${month}">${month} 月</a>`;
+                    ul.appendChild(li);
+                  });
+                container.appendChild(ul);
+              });
+            });
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching index.json:", error);
+          document.getElementById("list").textContent =
+            "無法載入歷史資料，請稍後再試。";
+        });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const openSearchButton = document.getElementById("open-search-popup");
+        const searchPopupOverlay = document.getElementById(
+          "search-popup-overlay"
+        );
+        const closeSearchPopup = document.getElementById("close-search-popup");
+        const popupSearchInput = document.getElementById("popup-search-input");
+        const performSearchButton = document.getElementById(
+          "perform-search-button"
+        );
+        const lastUpdateInfo = document.getElementById("last-update-info");
+
+        // 載入最後更新日期
+        fetch("data/last_update.json")
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.json();
+          })
+          .then((data) => {
+            if (data && data.last_update) {
+              lastUpdateInfo.textContent = `最後更新日期: ${data.last_update}`;
+            } else {
+              lastUpdateInfo.textContent = "最後更新日期: 無法載入";
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching last_update.json:", error);
+            lastUpdateInfo.textContent = "最後更新日期: 載入失敗";
+          });
+
+        openSearchButton.addEventListener("click", () => {
+          searchPopupOverlay.style.display = "flex";
+          popupSearchInput.focus();
+        });
+
+        closeSearchPopup.addEventListener("click", () => {
+          searchPopupOverlay.style.display = "none";
+          popupSearchInput.value = "";
+        });
+
+        searchPopupOverlay.addEventListener("click", (event) => {
+          if (event.target === searchPopupOverlay) {
+            searchPopupOverlay.style.display = "none";
+            popupSearchInput.value = "";
+          }
+        });
+
+        function triggerSearch() {
+          const query = popupSearchInput.value.trim();
+          if (query) {
+            window.location.href = `./pages/search_results.html?query=${encodeURIComponent(
+              query
+            )}`;
+          } else {
+            // 使用自訂訊息框替代 alert
+            const messageBox = document.createElement("div");
+            messageBox.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 1000;
+                text-align: center;
+            `;
+            messageBox.innerHTML = `
+                <p>請輸入搜尋關鍵字！</p>
+                <button onclick="this.parentNode.remove()" style="padding: 8px 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">確定</button>
+            `;
+            document.body.appendChild(messageBox);
+          }
+        }
+
+        performSearchButton.addEventListener("click", triggerSearch);
+
+        popupSearchInput.addEventListener("keypress", (event) => {
+          if (event.key === "Enter") {
+            triggerSearch();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
