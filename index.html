@@ -15,7 +15,7 @@
       gtag("config", "G-6RK6CC0PRD");
     </script>
     <meta charset="UTF-8" />
-    <title>しぐれういYoutube回顧</title>
+    <title data-i18n="main_title">しぐれうい Youtube Archive</title>
     <link rel="icon" href="./asset/icon.png" type="image/png" />
     <style>
       body {
@@ -45,14 +45,14 @@
         padding-bottom: 10px;
       }
       h2 {
-        /* Category titles like "宅宅軍團長直播回放" */
+        /* Category titles */
         color: #34495e;
         margin-top: 25px;
         padding-bottom: 5px;
         border-bottom: 1px solid #eee;
       }
       h3 {
-        /* Sub-category titles like "一般直播", "會限" */
+        /* Sub-category titles */
         color: #2980b9;
         margin-top: 15px;
       }
@@ -92,7 +92,9 @@
         gap: 10px;
       }
       .action-button {
-        display: inline-block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         padding: 8px 15px;
         background-color: #3498db;
         color: white;
@@ -101,7 +103,7 @@
         transition: background-color 0.3s ease, transform 0.2s ease;
         font-weight: bold;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 0.9em; /* Smaller font for buttons */
+        font-size: 0.9em;
       }
       .action-button:hover {
         background-color: #2980b9;
@@ -114,7 +116,7 @@
 
       /* Search Button Specific Styles */
       .search-button {
-        background-color: #f0ad4e; /* 橘色系 */
+        background-color: #f0ad4e; /* orange color */
         color: white;
         border: none;
         border-radius: 5px;
@@ -138,7 +140,7 @@
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
       }
       .search-button .icon {
-        font-size: 1.2em; /* 放大鏡圖示大小 */
+        font-size: 1.2em; /* magnifying glass icon size */
       }
       /* Search Input Pop-up Styles */
       #search-popup-overlay {
@@ -256,6 +258,36 @@
           display: none; /* Hide images completely on very small screens to save space */
         }
       }
+
+      /* Language Selector Styles */
+      .language-selector {
+        position: absolute;
+        top: 20px;
+        left: 30px;
+        z-index: 10;
+      }
+
+      .language-selector select {
+        padding: 8px 12px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        background-color: #f8f8f8;
+        font-size: 0.9em;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        appearance: none; /* Remove default select arrow */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-6.5%200-12.3%203.2-16.1%208.1-3.8%204.9-4.5%2011.6-2%2017.7l128%20192c3.6%205.4%209.7%208.7%2016.4%208.7s12.9-3.3%2016.4-8.7l128-192c2.5-6.1%201.8-12.8-2-17.7z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px top 50%;
+        background-size: 12px auto;
+        padding-right: 30px; /* Make space for the custom arrow */
+      }
+
+      .language-selector select:hover {
+        background-color: #e9e9e9;
+      }
     </style>
   </head>
   <body>
@@ -271,22 +303,30 @@
     />
 
     <div class="container">
-      <div class="top-right-buttons">
-        <button id="open-search-popup" class="search-button">
-          <span class="icon">🔍</span> 搜尋直播
-        </button>
-        <a href="index.html" class="action-button">回首頁</a>
+      <div class="language-selector">
+        <select id="language-select"></select>
       </div>
 
-      <h1>しぐれうい</h1>
+      <div class="top-right-buttons">
+        <button id="open-search-popup" class="search-button">
+          <span class="icon">🔍</span>
+          <span data-i18n="search_stream_button">Search Stream</span>
+        </button>
+        <a href="index.html" class="action-button" data-i18n="home_button"
+          >Home</a
+        >
+      </div>
+
+      <h1 data-i18n="main_title">しぐれうい</h1>
       <div id="list"></div>
 
       <div class="footer-info">
         <div id="last-update-info" class="last-update-info">
-          最後更新日期: 載入中...
+          <span data-i18n="last_updated">Last Updated</span>:
+          <span id="last-update-date">Loading...</span>
         </div>
         <div class="developer-info">
-          開發者:
+          <span data-i18n="developer">Developer</span>:
           <a href="https://github.com/Hung-Liang" target="_blank">Hung-Liang</a>
         </div>
       </div>
@@ -295,97 +335,26 @@
     <div id="search-popup-overlay">
       <div id="search-popup-content">
         <span id="close-search-popup">×</span>
-        <h2>搜尋直播</h2>
+        <h2 data-i18n="search_stream_popup_title">Search Stream</h2>
         <input
           type="text"
           id="popup-search-input"
-          placeholder="請輸入直播標題關鍵字"
+          data-i18n-placeholder="search_stream_placeholder"
+          placeholder="Please enter stream title keywords"
         />
-        <button id="perform-search-button">開始搜尋</button>
+        <button id="perform-search-button" data-i18n="start_search_button">
+          Start Search
+        </button>
       </div>
     </div>
 
+    <script src="./scripts/language.js"></script>
     <script>
-      fetch("data/index.json")
-        .then((res) => res.json())
-        .then((index) => {
-          const container = document.getElementById("list");
+      document.addEventListener("DOMContentLoaded", async () => {
+        // Initialize language
+        await loadTranslations();
+        applyTranslations();
 
-          // Define the desired order of categories (Life first, then Gaming)
-          const orderedCategories = ["videos"];
-
-          // Iterate through categories in the specified order
-          orderedCategories.forEach((category) => {
-            // Check if the category actually exists in the index data
-            if (!index[category]) {
-              return; // Skip if category data is missing
-            }
-
-            const categoryTitle = document.createElement("h2");
-            // Set category title based on category key
-            if (category === "videos") {
-              categoryTitle.textContent = "直播回放";
-            } else {
-              categoryTitle.textContent = `${
-                category.charAt(0).toUpperCase() + category.slice(1)
-              }`; // Fallback for other categories
-            }
-            container.appendChild(categoryTitle);
-
-            // Define the desired order of sub-categories (Normal first, then Member)
-            const orderedSubCategories = ["normal", "member"];
-
-            // Iterate through sub-categories in the specified order
-            orderedSubCategories.forEach((sub_category) => {
-              // Check if the sub_category actually exists under the current category
-              if (!index[category][sub_category]) {
-                return; // Skip if sub_category data is missing
-              }
-
-              const subCategoryTitle = document.createElement("h3");
-              // Set sub-category title based on sub_category key
-              if (sub_category === "normal") {
-                subCategoryTitle.textContent = "一般直播";
-              } else if (sub_category === "member") {
-                subCategoryTitle.textContent = "會限";
-              } else {
-                subCategoryTitle.textContent = `${
-                  sub_category.charAt(0).toUpperCase() + sub_category.slice(1)
-                }`; // Fallback
-              }
-              container.appendChild(subCategoryTitle);
-
-              const yearsData = index[category][sub_category];
-              const years = Object.keys(yearsData).sort((a, b) => b - a); // Sort years descending
-
-              years.forEach((year) => {
-                const yearText = document.createElement("p"); // Use p tag for year for now, can be h4
-                yearText.textContent = `${year} 年`;
-                yearText.style.fontWeight = "bold";
-                yearText.style.marginTop = "10px";
-                container.appendChild(yearText);
-
-                const ul = document.createElement("ul");
-                yearsData[year]
-                  .sort((a, b) => b - a) // Sort months descending
-                  .forEach((month) => {
-                    const li = document.createElement("li");
-                    // Link to month.html, passing category and sub_category
-                    li.innerHTML = `<a href="./pages/month.html?cat=${category}&sub=${sub_category}&y=${year}&m=${month}">${month} 月</a>`;
-                    ul.appendChild(li);
-                  });
-                container.appendChild(ul);
-              });
-            });
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching index.json:", error);
-          document.getElementById("list").textContent =
-            "無法載入歷史資料，請稍後再試。";
-        });
-
-      document.addEventListener("DOMContentLoaded", () => {
         const openSearchButton = document.getElementById("open-search-popup");
         const searchPopupOverlay = document.getElementById(
           "search-popup-overlay"
@@ -395,9 +364,100 @@
         const performSearchButton = document.getElementById(
           "perform-search-button"
         );
-        const lastUpdateInfo = document.getElementById("last-update-info");
+        const lastUpdateDateSpan = document.getElementById("last-update-date");
 
-        // 載入最後更新日期
+        fetch("data/index.json")
+          .then((res) => res.json())
+          .then((index) => {
+            const container = document.getElementById("list");
+
+            // Define the desired order of categories (Life first, then Gaming)
+            const orderedCategories = ["videos"];
+
+            // Iterate through categories in the specified order
+            orderedCategories.forEach((category) => {
+              // Check if the category actually exists in the index data
+              if (!index[category]) {
+                return; // Skip if category data is missing
+              }
+
+              const categoryTitle = document.createElement("h2");
+              // Set category title based on category key
+              if (category === "videos") {
+                categoryTitle.setAttribute("data-i18n", "live_stream_archive");
+              } else {
+                categoryTitle.textContent = `${
+                  category.charAt(0).toUpperCase() + category.slice(1)
+                }`; // Fallback for other categories
+              }
+              container.appendChild(categoryTitle);
+
+              // Define the desired order of sub-categories (Normal first, then Member)
+              const orderedSubCategories = ["normal", "member"];
+
+              // Iterate through sub-categories in the specified order
+              orderedSubCategories.forEach((sub_category) => {
+                // Check if the sub_category actually exists under the current category
+                if (!index[category][sub_category]) {
+                  return; // Skip if sub_category data is missing
+                }
+
+                const subCategoryTitle = document.createElement("h3");
+                // Set sub-category title based on sub_category key
+                if (sub_category === "normal") {
+                  subCategoryTitle.setAttribute("data-i18n", "stream_category");
+                } else if (sub_category === "member") {
+                  subCategoryTitle.setAttribute(
+                    "data-i18n",
+                    "member_only_category"
+                  );
+                } else {
+                  subCategoryTitle.textContent = `${
+                    sub_category.charAt(0).toUpperCase() + sub_category.slice(1)
+                  }`; // Fallback
+                }
+                container.appendChild(subCategoryTitle);
+
+                const yearsData = index[category][sub_category];
+                const years = Object.keys(yearsData).sort((a, b) => b - a); // Sort years descending
+
+                years.forEach((year) => {
+                  const yearText = document.createElement("p"); // Use p tag for year for now, can be h4
+                  yearText.textContent = `${year}`;
+                  yearText.style.fontWeight = "bold";
+                  yearText.style.marginTop = "10px";
+                  container.appendChild(yearText);
+
+                  const ul = document.createElement("ul");
+                  yearsData[year]
+                    .sort((a, b) => b - a) // Sort months descending
+                    .forEach((month) => {
+                      const li = document.createElement("li");
+                      const monthNameKey = `month_${month}`;
+                      // Add data-i18n attribute to the anchor tag
+                      li.innerHTML = `<a href="./pages/month.html?cat=${category}&sub=${sub_category}&y=${year}&m=${month}" data-i18n="${monthNameKey}">${
+                        translations[currentLanguage][monthNameKey] ||
+                        translations["en"][monthNameKey] ||
+                        month
+                      }</a>`;
+                      ul.appendChild(li);
+                    });
+                  container.appendChild(ul);
+                });
+              });
+            });
+            applyTranslations(); // Apply translations after dynamic content is added
+          })
+          .catch((error) => {
+            console.error("Error fetching index.json:", error);
+            document.getElementById("list").textContent =
+              "Unable to load history data, please try again later.";
+            document
+              .getElementById("list")
+              .setAttribute("data-i18n", "history_data_error");
+            applyTranslations();
+          });
+
         fetch("data/last_update.json")
           .then((res) => {
             if (!res.ok) {
@@ -407,14 +467,18 @@
           })
           .then((data) => {
             if (data && data.last_update) {
-              lastUpdateInfo.textContent = `最後更新日期: ${data.last_update}`;
+              lastUpdateDateSpan.textContent = data.last_update;
             } else {
-              lastUpdateInfo.textContent = "最後更新日期: 無法載入";
+              lastUpdateDateSpan.textContent = "Unable to load";
+              lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
             }
+            applyTranslations();
           })
           .catch((error) => {
             console.error("Error fetching last_update.json:", error);
-            lastUpdateInfo.textContent = "最後更新日期: 載入失敗";
+            lastUpdateDateSpan.textContent = "Unable to load";
+            lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
+            applyTranslations();
           });
 
         openSearchButton.addEventListener("click", () => {
@@ -441,7 +505,6 @@
               query
             )}`;
           } else {
-            // 使用自訂訊息框替代 alert
             const messageBox = document.createElement("div");
             messageBox.style.cssText = `
                 position: fixed;
@@ -456,10 +519,11 @@
                 text-align: center;
             `;
             messageBox.innerHTML = `
-                <p>請輸入搜尋關鍵字！</p>
-                <button onclick="this.parentNode.remove()" style="padding: 8px 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">確定</button>
+                <p data-i18n="enter_keywords_message">Please enter stream title keywords!</p>
+                <button onclick="this.parentNode.remove()" style="padding: 8px 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;" data-i18n="ok_button">OK</button>
             `;
             document.body.appendChild(messageBox);
+            applyTranslations(); // Apply translations to the message box
           }
         }
 

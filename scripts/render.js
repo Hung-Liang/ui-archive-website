@@ -57,8 +57,8 @@ fetch(`../data/${category}/${subCategory}/${year}/${month}.json`)
     .then((videos) => {
         const container = document.getElementById("video-list");
         if (videos.length === 0) {
-            container.innerHTML =
-                "<p style='text-align: center; margin-top: 50px;'>此月份沒有影片。</p>";
+            container.innerHTML = `<p style='text-align: center; margin-top: 50px;' data-i18n="no_videos_this_month">No videos available for this month.</p>`;
+            applyTranslations(); // Apply translations to the new content
             return;
         }
 
@@ -69,7 +69,8 @@ fetch(`../data/${category}/${subCategory}/${year}/${month}.json`)
     .catch((error) => {
         console.error("Error fetching or parsing video data:", error);
         const container = document.getElementById("video-list");
-        container.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;'>無法載入此月的影片資料。</p><p style='text-align: center; color: red;'>錯誤: ${error.message}</p>`;
+        container.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_video_data">Unable to load video data for this month.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
+        applyTranslations(); // Apply translations to the error message
     });
 
 const style = document.createElement("style");
@@ -127,7 +128,7 @@ style.textContent = `
     .back-to-prev-button {
         position: absolute;
         top: 20px;
-        left: 30px; /* Position to the left */
+        left: 150px; /* Adjusted to accommodate language selector */
         display: inline-block;
         padding: 8px 15px;
         background-color: #6c757d; /* A subtle grey for back button */
