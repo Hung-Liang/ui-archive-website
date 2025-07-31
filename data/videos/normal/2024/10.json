@@ -7,7 +7,9 @@
     "publishedAt": "2024-10-22T12:45:24Z",
     "thumbnail": "https://i.ytimg.com/vi/THD4b7SO-o4/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "ういの校内放送"
+    ]
   },
   {
     "title": "山に埋めにいくって言ったら、着いてきてくれる？",
@@ -17,7 +19,9 @@
     "publishedAt": "2024-10-21T15:17:42Z",
     "thumbnail": "https://i.ytimg.com/vi/Y0xkN5z7bwU/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "ういの校内放送"
+    ]
   },
   {
     "title": "ライブ、楽しかったね！",
@@ -27,7 +31,9 @@
     "publishedAt": "2024-10-04T14:55:57Z",
     "thumbnail": "https://i.ytimg.com/vi/lexjzD_5jVs/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "ういの校内放送"
+    ]
   },
   {
     "title": "【ライブ本編】SHIGURE UI 5th Anniversary Live \"masterpiece\" / 無料パート",
@@ -37,7 +43,10 @@
     "publishedAt": "2024-10-02T10:26:30Z",
     "thumbnail": "https://i.ytimg.com/vi/awWNQRPc9Dc/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "しぐれういリアルライブ",
+      "masterpiece"
+    ]
   },
   {
     "title": "えっソロライブ、明日！？",
@@ -47,6 +56,6 @@
     "publishedAt": "2024-10-01T11:00:03Z",
     "thumbnail": "https://i.ytimg.com/vi/aySYyva0kCc/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": []
   }
 ]

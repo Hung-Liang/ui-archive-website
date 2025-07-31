@@ -7,7 +7,7 @@
     "publishedAt": "2025-05-31T09:01:30Z",
     "thumbnail": "https://i.ytimg.com/vi/yM0FXixFNx4/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": []
   },
   {
     "title": "【3D LIVE】インターネット・ガール・バースデー 【#しぐれうい生誕2025】",
@@ -17,7 +17,7 @@
     "publishedAt": "2025-05-30T13:06:00Z",
     "thumbnail": "https://i.ytimg.com/vi/A1Cs9A8JhYs/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": []
   },
   {
     "title": "【オリジナル楽曲】ういこうせん / しぐれうい【にゃるら・Aiobahn +81】",
@@ -27,7 +27,7 @@
     "publishedAt": "2025-05-30T13:00:07Z",
     "thumbnail": "https://i.ytimg.com/vi/gq0C6-Qu1eQ/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": []
   },
   {
     "title": "しぐれうい 5th Anniversary Live “masterpiece” Blu-ray 全曲ダイジェスト",
@@ -37,7 +37,9 @@
     "publishedAt": "2025-05-25T10:00:06Z",
     "thumbnail": "https://i.ytimg.com/vi/Hk_7FPaTucc/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "Bd"
+    ]
   },
   {
     "title": "しぐれういが絶対に勝つ視聴者バトル型GeoGuessr",
@@ -47,7 +49,9 @@
     "publishedAt": "2025-05-20T14:52:48Z",
     "thumbnail": "https://i.ytimg.com/vi/zJfobaYFhoU/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "ういの校内放送"
+    ]
   },
   {
     "title": "絡みがほぼない人々に電話かける！！！！！ #しぐれうい6周年",
@@ -57,7 +61,10 @@
     "publishedAt": "2025-05-18T14:51:31Z",
     "thumbnail": "https://i.ytimg.com/vi/XumdmlMV7sU/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "しぐれうい6周年",
+      "ういの校内放送"
+    ]
   },
   {
     "title": "喋ったら即終了配信",
@@ -67,6 +74,8 @@
     "publishedAt": "2025-05-11T13:47:41Z",
     "thumbnail": "https://i.ytimg.com/vi/grELMEFqMLY/hqdefault.jpg",
     "playlistId": "UUt30jJgChL8qeT9VPadidSw",
-    "tags": null
+    "tags": [
+      "ういの校内放送"
+    ]
   }
 ]

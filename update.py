@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 
 import requests
@@ -18,12 +19,19 @@ PLAYLIST_IDS = {
 }
 
 
-def parse_description_for_tags(title, description):
+def parse_description_for_tags(description):
     """
     Parses video description to extract tags.
     Currently empty, awaiting your algorithm.
     """
-    return
+
+    tags = []
+
+    all_tags = re.findall(r"#(\w+)", description)
+    for tag in all_tags:
+        tags.append(tag)
+
+    return tags
 
 
 def fetch_videos_from_playlist(playlist_id, max_results=30):
@@ -55,9 +63,7 @@ def fetch_videos_from_playlist(playlist_id, max_results=30):
             continue
 
         # Parse tags
-        tags = parse_description_for_tags(
-            snippet.get("title", ""), snippet.get("description", "")
-        )
+        tags = parse_description_for_tags(snippet.get("description", ""))
 
         video = {
             "title": snippet["title"],
@@ -109,9 +115,7 @@ def fetch_all_videos_from_playlist(playlist_id):
                 continue
 
             # Parse tags
-            tags = parse_description_for_tags(
-                snippet.get("title", ""), snippet.get("description", "")
-            )
+            tags = parse_description_for_tags(snippet.get("description", ""))
 
             video = {
                 "title": snippet["title"],
