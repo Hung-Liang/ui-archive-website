@@ -3,6 +3,12 @@
 - 這是一個網站，專門用來回顧しぐれうい的 YouTube 直播回放。
 - 網站會自動每天透過YouTube API更新上傳。
 
+## 🌐 語言
+
+* [English](docs/README.en.md)
+* [繁體中文](docs/README.zh-TW.md)
+* [日本語](docs/README.jp.md)
+
 ## 🚀 使用方法
 
 - 瀏覽 [しぐれうい回顧網站](https://ui-archive-website.bobing.dev/index.html)。
@@ -16,4 +22,3 @@
 ## ☕ Support me
 
 <a href="https://www.buymeacoffee.com/hungliang" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
-translate to eng

@@ -8,6 +8,7 @@
 
 * [English](docs/README.en.md)
 * [繁體中文](docs/README.zh-TW.md)
+* [日本語](docs/README.jp.md)
 
 ## 🚀 How to Use
 
