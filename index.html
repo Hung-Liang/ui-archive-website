@@ -16,6 +16,15 @@
     </script>
     <meta charset="UTF-8" />
     <title data-i18n="main_title">しぐれうい Youtube Archive</title>
+    <meta name="description" content="Archive of Shigure Ui's YouTube streams and videos." />
+    <meta property="og:title" content="しぐれうい Youtube Archive" />
+    <meta property="og:description" content="Archive of Shigure Ui's YouTube streams and videos." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://hung-liang.github.io/ui-archive-website/asset/icon.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="しぐれうい Youtube Archive" />
+    <meta name="twitter:description" content="Archive of Shigure Ui's YouTube streams and videos." />
+    <meta name="twitter:image" content="https://hung-liang.github.io/ui-archive-website/asset/icon.png" />
     <link rel="icon" href="./asset/icon.png" type="image/png" />
     <style>
       body {
@@ -288,18 +297,42 @@
       .language-selector select:hover {
         background-color: #e9e9e9;
       }
+
+      /* Skeleton Loading Styles */
+      @keyframes skeleton-loading {
+        0% { background-color: #e2e5e7; }
+        100% { background-color: #f1f3f4; }
+      }
+      .skeleton-title {
+        height: 30px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        animation: skeleton-loading 1s linear infinite alternate;
+      }
+      .skeleton-pill {
+        width: 60px; 
+        height: 35px; 
+        border-radius: 5px; 
+        background-color: #e2e5e7;
+        animation: skeleton-loading 1s linear infinite alternate;
+      }
     </style>
   </head>
   <body>
     <img
-      src="./asset/left_image.png"
+      src="./asset/left_image.webp"
       alt="Left Decor Image"
       class="side-image left"
+      width="1000"
+      height="1000"
     />
     <img
-      src="./asset/right_image.png"
+      src="./asset/right_image.webp"
       alt="Right Decor Image"
       class="side-image right"
+      width="1000"
+      height="1000"
     />
 
     <div class="container">
@@ -318,7 +351,23 @@
       </div>
 
       <h1 data-i18n="main_title">しぐれうい</h1>
-      <div id="list"></div>
+      <div id="list">
+        <!-- Skeleton Loaders -->
+        <div class="skeleton-title" style="width: 30%;"></div>
+        <div class="skeleton-title" style="width: 15%; height: 20px; margin-top: 15px;"></div>
+        <ul>
+          <li class="skeleton-pill"></li>
+          <li class="skeleton-pill"></li>
+          <li class="skeleton-pill"></li>
+        </ul>
+        <div class="skeleton-title" style="width: 30%; margin-top: 40px;"></div>
+        <div class="skeleton-title" style="width: 15%; height: 20px; margin-top: 15px;"></div>
+        <ul>
+          <li class="skeleton-pill"></li>
+          <li class="skeleton-pill"></li>
+          <li class="skeleton-pill"></li>
+        </ul>
+      </div>
 
       <div class="footer-info">
         <div id="last-update-info" class="last-update-info">
@@ -370,6 +419,7 @@
           .then((res) => res.json())
           .then((index) => {
             const container = document.getElementById("list");
+            container.innerHTML = ""; // Clear skeleton loaders
 
             // Define the desired order of categories (Life first, then Gaming)
             const orderedCategories = ["videos"];

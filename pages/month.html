@@ -16,10 +16,225 @@
     </script>
     <meta charset="UTF-8" />
     <title data-i18n="stream_of_the_month_title">Stream of the Month</title>
+    <meta name="description" content="Stream of the Month - Shigure Ui YouTube Archive." />
+    <meta property="og:title" content="Stream of the Month - しぐれうい Youtube Archive" />
+    <meta property="og:description" content="Stream of the Month - Shigure Ui YouTube Archive." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://hung-liang.github.io/ui-archive-website/asset/icon.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Stream of the Month - しぐれうい Youtube Archive" />
+    <meta name="twitter:description" content="Stream of the Month - Shigure Ui YouTube Archive." />
+    <meta name="twitter:image" content="https://hung-liang.github.io/ui-archive-website/asset/icon.png" />
     <link rel="icon" href="../asset/icon.png" type="image/png" />
     <style>
-      /* 這裡可以放 month.html 獨有的 CSS 樣式，
-         render.js 會注入共用的樣式 */
+      /* Injected CSS from render.js to prevent FOUC */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      .container {
+        max-width: 960px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+        min-height: calc(100vh - 40px);
+        box-sizing: border-box;
+      }
+      .side-image {
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: -1;
+        opacity: 0.3;
+        max-height: 80vh;
+        width: auto;
+      }
+      .side-image.left {
+        left: 20px;
+      }
+      .side-image.right {
+        right: 20px;
+      }
+      @media (max-width: 1200px) {
+        .side-image {
+          opacity: 0.15;
+        }
+      }
+      @media (max-width: 992px) {
+        .side-image {
+          display: none;
+        }
+      }
+      .back-to-prev-button {
+        position: absolute;
+        top: 20px;
+        left: 150px; /* Adjusted to accommodate language selector */
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 0.9em;
+        z-index: 10;
+      }
+      .back-to-prev-button:hover {
+        background-color: #5a6268;
+        transform: translateY(-2px);
+      }
+      .back-to-prev-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .top-right-buttons {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        display: flex;
+        gap: 10px;
+      }
+      .action-button {
+        display: inline-block;
+        padding: 8px 15px;
+        background-color: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-size: 0.9em;
+      }
+      .action-button:hover {
+        background-color: #2980b9;
+        transform: translateY(-2px);
+      }
+      .action-button:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .footer-info {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100% - 60px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.8em;
+        color: #777;
+      }
+      .developer-info {
+        flex-grow: 1;
+        text-align: right;
+      }
+      .last-update-info {
+        flex-grow: 1;
+        text-align: left;
+      }
+      .developer-info a, .last-update-info a {
+        color: #777;
+        text-decoration: underline;
+        font-weight: normal;
+      }
+      .developer-info a:hover, .last-update-info a:hover {
+        color: #333;
+      }
+      #video-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+        margin-top: 50px;
+      }
+      .video-item {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.2s ease-in-out;
+      }
+      .video-item:hover {
+        transform: translateY(-5px);
+      }
+      .video-item a {
+        display: block;
+        padding-bottom: 10px;
+        color: inherit;
+        text-decoration: none;
+      }
+      .video-item img {
+        max-width: 100%;
+        height: auto;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 10px;
+      }
+      .video-item .video-title {
+        font-weight: bold;
+        padding: 0 10px;
+        margin-bottom: 5px;
+        color: #333;
+      }
+      .video-item .video-date {
+        font-size: 0.9em;
+        color: #666;
+        padding: 0 10px;
+      }
+      .video-item .video-tags {
+        padding: 5px 10px 10px;
+        font-size: 0.8em;
+        color: #555;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+      }
+      .video-item .video-tags span {
+        background-color: #e0e0e0;
+        padding: 3px 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .video-item .video-tags span:hover {
+        background-color: #c0c0c0;
+      }
+
+      /* Skeleton Loading Styles */
+      @keyframes skeleton-loading {
+        0% { background-color: #e2e5e7; }
+        100% { background-color: #f1f3f4; }
+      }
+      .skeleton-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        height: 280px;
+      }
+      .skeleton-image {
+        height: 180px;
+        width: 100%;
+        animation: skeleton-loading 1s linear infinite alternate;
+      }
+      .skeleton-text {
+        height: 15px;
+        margin: 10px;
+        border-radius: 4px;
+        animation: skeleton-loading 1s linear infinite alternate;
+      }
       /* Language Selector Styles */
       .language-selector {
         position: absolute;
@@ -53,14 +268,18 @@
   </head>
   <body>
     <img
-      src="../asset/left_image.png"
+      src="../asset/left_image.webp"
       alt="Left Decor Image"
       class="side-image left"
+      width="1000"
+      height="1000"
     />
     <img
-      src="../asset/right_image.png"
+      src="../asset/right_image.webp"
       alt="Right Decor Image"
       class="side-image right"
+      width="1000"
+      height="1000"
     />
 
     <div class="container">
@@ -81,7 +300,24 @@
         >
       </div>
 
-      <div id="video-list"></div>
+      <div id="video-list">
+        <!-- Skeleton Loaders -->
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-text" style="width: 80%;"></div>
+          <div class="skeleton-text" style="width: 40%;"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-text" style="width: 70%;"></div>
+          <div class="skeleton-text" style="width: 50%;"></div>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-text" style="width: 90%;"></div>
+          <div class="skeleton-text" style="width: 30%;"></div>
+        </div>
+      </div>
 
       <div class="footer-info">
         <div id="last-update-info" class="last-update-info">
