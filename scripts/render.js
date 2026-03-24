@@ -23,7 +23,7 @@ function renderVideoItem(video) {
 
     div.innerHTML = `
         <a href="${youtubeUrl}" target="_blank">
-            <img src="${video.thumbnail}" alt="${video.title}" width="320">
+            <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
             <p class="video-title">${video.title}</p>
             <p class="video-date">${new Date(video.publishedAt).toLocaleDateString()}</p>
         </a>
