@@ -26,7 +26,23 @@
     <meta name="twitter:description" content="Archive of Shigure Ui's YouTube streams and videos." />
     <meta name="twitter:image" content="https://hung-liang.github.io/ui-archive-website/asset/icon.png" />
     <link rel="icon" href="./asset/icon.png" type="image/png" />
+    <link rel="manifest" href="./manifest.json" />
+    <meta name="theme-color" content="#333333" />
     <script src="./scripts/theme.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => {
+              console.log("Service Worker registered with scope:", registration.scope);
+            })
+            .catch((error) => {
+              console.log("Service Worker registration failed:", error);
+            });
+        });
+      }
+    </script>
     <style>
       body {
         font-family: Arial, sans-serif;
