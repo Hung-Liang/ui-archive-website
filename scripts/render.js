@@ -39,7 +39,7 @@ function renderVideoItem(video) {
                 const tag = tagSpan.dataset.tag; // This tag is already lowercase
                 // Redirect to search_results.html with the tag as a query parameter
                 window.location.href = `../pages/search_results.html?tag=${encodeURIComponent(
-                    tag
+                    tag,
                 )}`;
             });
         });
@@ -73,4 +73,3 @@ fetch(`../data/${category}/${subCategory}/${year}/${month}.json`)
         container.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_video_data">Unable to load video data for this month.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
         applyTranslations(); // Apply translations to the error message
     });
-

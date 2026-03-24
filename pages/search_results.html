@@ -15,7 +15,6 @@
       gtag("config", "G-6RK6CC0PRD");
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="search_results_title">Search Results</title>
     <meta name="description" content="Search Results - Shigure Ui YouTube Archive." />
     <meta property="og:title" content="Search Results - しぐれうい Youtube Archive" />
@@ -409,58 +408,6 @@
         background-color: #2c2c2c;
         background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-6.5%200-12.3%203.2-16.1%208.1-3.8%204.9-4.5%2011.6-2%2017.7l128%20192c3.6%205.4%209.7%208.7%2016.4%208.7s12.9-3.3%2016.4-8.7l128-192c2.5-6.1%201.8-12.8-2-17.7z%22%2F%3E%3C%2Fsvg%3E");
       }
-
-      /* Mobile Responsive Optimizations */
-      @media (max-width: 600px) {
-        body {
-          margin: 0;
-        }
-        .container {
-          margin: 0;
-          padding: 15px;
-          border-radius: 0;
-          min-height: 100vh;
-        }
-        .language-selector {
-          position: static;
-          text-align: center;
-          margin-bottom: 10px;
-        }
-        .back-to-prev-button {
-          position: static;
-          display: block;
-          text-align: center;
-          margin-bottom: 10px;
-        }
-        .top-right-buttons {
-          position: static;
-          justify-content: center;
-          margin-bottom: 20px;
-          flex-wrap: wrap;
-        }
-        #search-input-container {
-          margin-top: 20px;
-        }
-        #search-input {
-          width: 95%;
-        }
-        .video-grid {
-          grid-template-columns: 1fr; /* Single column for mobile */
-          gap: 15px;
-        }
-        .footer-info {
-          position: static;
-          transform: none;
-          width: 100%;
-          flex-direction: column;
-          gap: 10px;
-          margin-top: 30px;
-          text-align: center;
-        }
-        .last-update-info, .developer-info {
-          text-align: center;
-        }
-      }
     </style>
   </head>
   <body>
@@ -795,6 +742,59 @@
             searchResultsInfo.textContent = `${translations[currentLanguage]["found_results_prefix"]} ${filteredResults.length} ${translations[currentLanguage]["found_results_suffix"]}`;
             applyTranslations(); // Apply translations after updating text
           }
+        }
+
+        // Event delegation for tag clicks on videoListContainer
+        videoListContainer.addEventListener("click", (event) => {
+          const target = event.target;
+          // Check if the clicked element is a tag span
+          if (target.matches(".video-tags span")) {
+            event.preventDefault(); // Prevent default link behavior
+            event.stopPropagation(); // Stop event bubbling
+            const tag = target.dataset.tag; // This tag is already lowercase from renderVideoItem
+            // Redirect to search_results.html with the tag as a query parameter
+            // For multiple tags, we'll just pass the single clicked tag.
+            // User can then manually add more tags in the search bar if needed.
+            window.location.href = `./search_results.html?tag=${encodeURIComponent(
+              tag
+            )}`;
+          }
+        });
+
+        // Fetch all videos index data
+        fetch("../data/all_videos_index.json")
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(
+                `HTTP error! status: ${res.status} for ${res.url}`
+              );
+            }
+            return res.json();
+          })
+          .then((data) => {
+            allVideosIndexData = data;
+            // Perform search based on initial query or tag
+            // The performSearch function now handles both single and multiple tags
+            if (initialTagSearch || initialSearchTerm) {
+              performSearch();
+            } else {
+              // Otherwise, prompt user to search
+              searchResultsInfo.textContent =
+                translations[currentLanguage]["enter_keywords_to_search"];
+            }
+            applyTranslations(); // Apply translations after updating text
+          })
+          .catch((error) => {
+            console.error("Error fetching all_videos_index.json:", error);
+            videoListContainer.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_search_data">Unable to load search data, please try again later.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
+            applyTranslations(); // Apply translations after updating text
+          });
+
+        searchInput.addEventListener("input", performSearch);
+      });
+    </script>
+  </body>
+</html>
         }
 
         // Event delegation for tag clicks on videoListContainer
