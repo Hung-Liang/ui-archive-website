@@ -21,10 +21,18 @@ function renderVideoItem(video) {
             `</div>`;
     }
 
+    const durationHtml = video.duration ? `<span class="video-duration">${video.duration}</span>` : "";
+    const viewCountText = (window.translations[window.currentLanguage] && window.translations[window.currentLanguage]["view_count"]) || "views";
+    const viewCountHtml = video.viewCount ? `<p class="video-view-count">${Number(video.viewCount).toLocaleString()} ${viewCountText}</p>` : "";
+
     div.innerHTML = `
         <a href="${youtubeUrl}" target="_blank">
-            <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
+            <div class="video-thumbnail-container">
+                <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
+                ${durationHtml}
+            </div>
             <p class="video-title">${video.title}</p>
+            ${viewCountHtml}
             <p class="video-date">${new Date(video.publishedAt).toLocaleDateString()}</p>
         </a>
         ${tagsHtml}

@@ -17,8 +17,10 @@
     "stream_of_the_month_title": "今月の配信",
     "back_button": "← 戻る",
     "no_videos_this_month": "今月の配信はまだありません。",
-    "unable_to_load_video_data": "今月の配信が読み込めませんでした。",
+    "unable_to_load_video_data": "今月のビデオデータを読み込めませんでした。",
+    "view_count": "回視聴",
     "search_results_title": "検索結果",
+
     "back_to_home_button": "← ホームに戻る",
     "search_input_placeholder": "配信タイトルのキーワードを入力してください...",
     "no_matching_streams": "該当する配信は見つかりませんでした。",

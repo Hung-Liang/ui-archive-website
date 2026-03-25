@@ -18,6 +18,7 @@
     "back_button": "← Back",
     "no_videos_this_month": "No videos available for this month.",
     "unable_to_load_video_data": "Unable to load video data for this month.",
+    "view_count": "views",
     "search_results_title": "Search Results",
     "back_to_home_button": "← Back to Home",
     "search_input_placeholder": "Enter stream title keywords to search...",

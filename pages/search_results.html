@@ -232,6 +232,31 @@
         background-color: #c0c0c0;
       }
 
+      .video-thumbnail-container {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+      .video-duration {
+        position: absolute;
+        bottom: 8px;
+        right: 8px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 2px 5px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        font-weight: bold;
+      }
+      .video-view-count {
+        font-size: 0.85em;
+        color: #777;
+        margin-top: 2px;
+      }
+      html.dark-mode .video-view-count {
+        color: #aaa;
+      }
+
       /* Footer styles */
       .footer-info {
         position: absolute;
@@ -586,10 +611,18 @@
               `</div>`;
           }
 
+          const durationHtml = video.duration ? `<span class="video-duration">${video.duration}</span>` : "";
+          const viewCountText = (translations[currentLanguage] && translations[currentLanguage]["view_count"]) || "views";
+          const viewCountHtml = video.viewCount ? `<p class="video-view-count">${Number(video.viewCount).toLocaleString()} ${viewCountText}</p>` : "";
+
           div.innerHTML = `
             <a href="${youtubeUrl}" target="_blank">
-              <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
+              <div class="video-thumbnail-container">
+                <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
+                ${durationHtml}
+              </div>
               <p class="video-title">${video.title}</p>
+              ${viewCountHtml}
               <p class="video-meta">
                 (${video.year}${
             translations[currentLanguage]["year_suffix"] || ""

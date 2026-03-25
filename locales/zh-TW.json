@@ -17,8 +17,10 @@
     "stream_of_the_month_title": "該月的直播",
     "back_button": "← 返回",
     "no_videos_this_month": "本月沒有直播影片。",
-    "unable_to_load_video_data": "無法載入本月影片資料。",
+    "unable_to_load_video_data": "無法載入此月的影片資料。",
+    "view_count": "次觀看",
     "search_results_title": "搜尋結果",
+
     "back_to_home_button": "← 回首頁",
     "search_input_placeholder": "輸入直播標題關鍵字搜尋...",
     "no_matching_streams": "沒有找到符合條件的直播。",
