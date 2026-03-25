@@ -1,7 +1,7 @@
 {
     "search_stream_button": "搜尋直播",
     "home_button": "首頁",
-    "main_title": "しぐれうい Youtube 回放",
+    "main_title": "しぐれうい Youtube 存檔",
     "last_updated": "最後更新日期",
     "developer": "開發者",
     "search_stream_popup_title": "搜尋直播",
@@ -9,7 +9,7 @@
     "start_search_button": "開始搜尋",
     "enter_keywords_message": "請輸入直播標題關鍵字！",
     "ok_button": "確定",
-    "live_stream_archive": "直播回放",
+    "live_stream_archive": "直播存檔",
     "stream_category": "直播",
     "member_only_category": "會限",
     "history_data_error": "無法載入歷史資料，請稍後再試。",
