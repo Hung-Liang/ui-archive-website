@@ -478,6 +478,66 @@ def daily_update():
     print("Daily update complete.")
 
 
+def clean_up_local_data(all_fetched_video_metadata):
+    """
+    Scans all local JSON files in data/ and removes videos that are no longer
+    present in the fetched metadata or have moved to a different category.
+    """
+    print("--- Starting Local Data Clean-up ---")
+    base_data_path = "data"
+    if not os.path.exists(base_data_path):
+        return
+
+    removed_count = 0
+    for category_folder in os.listdir(base_data_path):
+        category_path = os.path.join(base_data_path, category_folder)
+        if (
+            not os.path.isdir(category_path)
+            or category_folder.startswith('.')
+            or category_folder in ['index.json', 'all_videos_index.json', 'last_update.json']
+        ):
+            continue
+
+        for sub_category_folder in os.listdir(category_path):
+            sub_category_path = os.path.join(category_path, sub_category_folder)
+            if not os.path.isdir(sub_category_path) or sub_category_folder.startswith('.'):
+                continue
+
+            for year_folder in os.listdir(sub_category_path):
+                if not year_folder.isdigit():
+                    continue
+                year_path = os.path.join(sub_category_path, year_folder)
+                
+                for file in os.listdir(year_path):
+                    if file.endswith(".json") and file[:-5].isdigit():
+                        month = int(file[:-5])
+                        path = get_save_path(category_folder, sub_category_folder, int(year_folder), month)
+                        
+                        with open(path, "r", encoding="utf-8") as f:
+                            videos = json.load(f)
+                        
+                        original_count = len(videos)
+                        # Filter videos: must be in metadata AND in the correct category/sub_category
+                        pruned_videos = []
+                        for v in videos:
+                            video_id = v["videoId"]
+                            if video_id in all_fetched_video_metadata:
+                                expected_cat, expected_sub_cat = all_fetched_video_metadata[video_id]
+                                if expected_cat == category_folder and expected_sub_cat == sub_category_folder:
+                                    pruned_videos.append(v)
+                                else:
+                                    print(f"Video {video_id} moved: {category_folder}/{sub_category_folder} -> {expected_cat}/{expected_sub_cat}")
+                            else:
+                                print(f"Video {video_id} not found in playlists, removing from {path}")
+                        
+                        if len(pruned_videos) != original_count:
+                            removed_count += (original_count - len(pruned_videos))
+                            with open(path, "w", encoding="utf-8") as f:
+                                json.dump(pruned_videos, f, ensure_ascii=False, indent=2)
+    
+    print(f"Clean-up complete. Removed {removed_count} orphaned or misplaced video entries.")
+
+
 def initialize_all_playlists():
     """
     Executes initialization, fetching all videos from all playlists.
@@ -488,6 +548,8 @@ def initialize_all_playlists():
         "WARNING: This operation will consume a significant amount of "
         "API quota. Use with caution."
     )
+
+    all_fetched_video_metadata = {}
 
     for category, sub_categories in PLAYLIST_IDS.items():
         for sub_category, playlist_id in sub_categories.items():
@@ -502,8 +564,13 @@ def initialize_all_playlists():
                 f"-> '{sub_category}'."
             )
 
+            # Populate metadata for clean-up
+            for v in videos:
+                all_fetched_video_metadata[v["videoId"]] = (category, sub_category)
+
             process_videos_for_saving(videos, category, sub_category)
 
+    clean_up_local_data(all_fetched_video_metadata)
     update_index_json()
     generate_all_videos_index()
     update_last_update_date()
