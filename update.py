@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import tempfile
 from datetime import datetime
 
 import requests
@@ -71,7 +72,7 @@ def fetch_video_details(video_ids):
         "part": "contentDetails,statistics",
     }
 
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=30)
     response.raise_for_status()
     data = response.json()
 
@@ -105,7 +106,7 @@ def fetch_videos_from_playlist(playlist_id, max_results=30):
         "maxResults": max_results,
     }
 
-    response = requests.get(url, params=params)
+    response = requests.get(url, params=params, timeout=30)
     response.raise_for_status()
 
     data = response.json()
@@ -166,7 +167,7 @@ def fetch_all_videos_from_playlist(playlist_id):
             "pageToken": next_page_token,
         }
 
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=30)
         response.raise_for_status()
         data = response.json()
 
@@ -221,6 +222,23 @@ def get_save_path(category, sub_category, year, month):
     return f"data/{category}/{sub_category}/{year}/{month:02d}.json"
 
 
+def atomic_save_json(data, filepath):
+    """
+    Saves JSON data atomically to prevent file corruption during
+    unexpected termination.
+    """
+    dir_path = os.path.dirname(filepath)
+    os.makedirs(dir_path, exist_ok=True)
+    fd, temp_path = tempfile.mkstemp(dir=dir_path, suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        os.replace(temp_path, filepath)
+    except BaseException:
+        os.remove(temp_path)
+        raise
+
+
 def load_existing_videos(category, sub_category, year, month):
     """
     Loads existing video data based on the new path structure.
@@ -255,12 +273,8 @@ def save_json_merged(new_videos, category, sub_category, year, month):
         reverse=True,
     )
 
-    dir_path = f"data/{category}/{sub_category}/{year}"
-    os.makedirs(dir_path, exist_ok=True)
-
     path = get_save_path(category, sub_category, year, month)
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(sorted_videos, f, ensure_ascii=False, indent=2)
+    atomic_save_json(sorted_videos, path)
 
 
 def update_index_json():
@@ -322,10 +336,7 @@ def update_index_json():
                         int(year_folder)
                     ] = sorted(months, reverse=True)
 
-    with open(
-        os.path.join(base_data_path, "index.json"), "w", encoding="utf-8"
-    ) as f:
-        json.dump(index, f, ensure_ascii=False, indent=2)
+    atomic_save_json(index, os.path.join(base_data_path, "index.json"))
 
 
 def process_videos_for_saving(videos, category, sub_category):
@@ -438,8 +449,7 @@ def generate_all_videos_index():
     )
 
     index_path = os.path.join(base_data_path, "all_videos_index.json")
-    with open(index_path, "w", encoding="utf-8") as f:
-        json.dump(all_videos_data, f, ensure_ascii=False, indent=2)
+    atomic_save_json(all_videos_data, index_path)
     print(
         f"Generated {len(all_videos_data)} entries in all_videos_index.json."
     )
@@ -448,8 +458,7 @@ def generate_all_videos_index():
 def update_last_update_date():
     """Updates the last update date to the file."""
     today = datetime.now().strftime("%Y-%m-%d %H:%M")
-    with open(LAST_UPDATE_FILE, "w", encoding="utf-8") as f:
-        json.dump({"last_update": today}, f, ensure_ascii=False, indent=2)
+    atomic_save_json({"last_update": today}, LAST_UPDATE_FILE)
     print(f"Last update date updated to: {today}")
 
 
@@ -532,8 +541,7 @@ def clean_up_local_data(all_fetched_video_metadata):
                         
                         if len(pruned_videos) != original_count:
                             removed_count += (original_count - len(pruned_videos))
-                            with open(path, "w", encoding="utf-8") as f:
-                                json.dump(pruned_videos, f, ensure_ascii=False, indent=2)
+                            atomic_save_json(pruned_videos, path)
     
     print(f"Clean-up complete. Removed {removed_count} orphaned or misplaced video entries.")
 
@@ -550,7 +558,10 @@ def initialize_all_playlists():
     )
 
     all_fetched_video_metadata = {}
+    fetched_playlists = []
 
+    # Fetch every playlist before writing anything, so a failed or
+    # empty fetch can never trigger clean-up on incomplete metadata.
     for category, sub_categories in PLAYLIST_IDS.items():
         for sub_category, playlist_id in sub_categories.items():
             print(
@@ -564,11 +575,21 @@ def initialize_all_playlists():
                 f"-> '{sub_category}'."
             )
 
+            if not videos:
+                raise RuntimeError(
+                    f"Playlist {playlist_id} ('{category}' -> "
+                    f"'{sub_category}') returned no videos. "
+                    "Aborting to prevent data loss."
+                )
+
             # Populate metadata for clean-up
             for v in videos:
                 all_fetched_video_metadata[v["videoId"]] = (category, sub_category)
 
-            process_videos_for_saving(videos, category, sub_category)
+            fetched_playlists.append((videos, category, sub_category))
+
+    for videos, category, sub_category in fetched_playlists:
+        process_videos_for_saving(videos, category, sub_category)
 
     clean_up_local_data(all_fetched_video_metadata)
     update_index_json()
