@@ -2,6 +2,8 @@
 let translations = {};
 let currentLanguage = localStorage.getItem("language") || "en"; // Default to English
 
+const localesBaseUrl = new URL("../locales/", document.currentScript.src);
+
 const languageMap = {
     en: "English",
     "zh-TW": "繁體中文",
@@ -11,7 +13,7 @@ const languageMap = {
 async function loadTranslations() {
     try {
         // Correct the path to access the locales folder from the parent directory
-        const response = await fetch(`../locales/${currentLanguage}.json`);
+        const response = await fetch(new URL(`${currentLanguage}.json`, localesBaseUrl));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -20,13 +22,13 @@ async function loadTranslations() {
         // Load other languages if needed, or just the current one
         // Ensure paths are correct for all fetches
         if (currentLanguage !== "en") {
-            const enResponse = await fetch("../locales/en.json");
+            const enResponse = await fetch(new URL("en.json", localesBaseUrl));
             if (enResponse.ok) {
                 translations["en"] = await enResponse.json();
             }
         }
         if (currentLanguage !== "zh-TW") {
-            const zhTwResponse = await fetch("../locales/zh-TW.json");
+            const zhTwResponse = await fetch(new URL("zh-TW.json", localesBaseUrl));
             if (zhTwResponse.ok) {
                 translations["zh-TW"] = await zhTwResponse.json();
             }
@@ -35,7 +37,7 @@ async function loadTranslations() {
         console.error("Error loading translations:", error);
         // Fallback to English if loading fails
         currentLanguage = "en";
-        const fallbackResponse = await fetch("../locales/en.json"); // Corrected path for fallback
+        const fallbackResponse = await fetch(new URL("en.json", localesBaseUrl)); // Corrected path for fallback
         if (fallbackResponse.ok) {
             translations["en"] = await fallbackResponse.json();
         }
