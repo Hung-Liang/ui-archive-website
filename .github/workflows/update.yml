@@ -20,6 +20,9 @@ jobs:
       - name: Install dependencies
         run: pip install requests
 
+      - name: Run tests
+        run: python -m unittest discover -s tests
+
       - name: Run update script
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
