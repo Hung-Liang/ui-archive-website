@@ -579,6 +579,15 @@
 
     <script src="./scripts/language.js"></script>
     <script>
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
       document.addEventListener("DOMContentLoaded", async () => {
         // Initialize language
         await loadTranslations();
@@ -665,11 +674,11 @@
                       const li = document.createElement("li");
                       const monthNameKey = `month_${month}`;
                       // Add data-i18n attribute to the anchor tag
-                      li.innerHTML = `<a href="./pages/month.html?cat=${category}&sub=${sub_category}&y=${year}&m=${month}" data-i18n="${monthNameKey}">${
+                      li.innerHTML = `<a href="./pages/month.html?cat=${escapeHtml(category)}&sub=${escapeHtml(sub_category)}&y=${escapeHtml(year)}&m=${escapeHtml(month)}" data-i18n="${escapeHtml(monthNameKey)}">${escapeHtml(
                         translations[currentLanguage][monthNameKey] ||
                         translations["en"][monthNameKey] ||
                         month
-                      }</a>`;
+                      )}</a>`;
                       ul.appendChild(li);
                     });
                   container.appendChild(ul);

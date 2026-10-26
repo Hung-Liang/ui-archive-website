@@ -6,6 +6,15 @@ const month = String(params.get("m")).padStart(2, "0");
 
 // Removed tag popup related elements and logic as it's now handled by redirection to search_results.html
 
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 function renderVideoItem(video) {
     const div = document.createElement("div");
     div.className = "video-item";
@@ -16,7 +25,7 @@ function renderVideoItem(video) {
         tagsHtml =
             `<div class="video-tags">` +
             video.tags
-                .map((tag) => `<span data-tag="${String(tag).toLowerCase()}">${tag}</span>`)
+                .map((tag) => `<span data-tag="${escapeHtml(String(tag).toLowerCase())}">${escapeHtml(tag)}</span>`)
                 .join("") +
             `</div>`;
     }
@@ -28,10 +37,10 @@ function renderVideoItem(video) {
     div.innerHTML = `
         <a href="${youtubeUrl}" target="_blank">
             <div class="video-thumbnail-container">
-                <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
+                <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" width="320" loading="lazy">
                 ${durationHtml}
             </div>
-            <p class="video-title">${video.title}</p>
+            <p class="video-title">${escapeHtml(video.title)}</p>
             ${viewCountHtml}
             <p class="video-date">${new Date(video.publishedAt).toLocaleDateString()}</p>
         </a>

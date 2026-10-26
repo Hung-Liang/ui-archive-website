@@ -590,6 +590,15 @@
           return "";
         }
 
+        function escapeHtml(value) {
+          return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
         // Function to render a single video item
         function renderVideoItem(video) {
           const div = document.createElement("div");
@@ -603,9 +612,9 @@
               video.tags
                 .map(
                   (tag) =>
-                    `<span data-tag="${String(
-                      tag
-                    ).toLowerCase()}">${tag}</span>`
+                    `<span data-tag="${escapeHtml(
+                      String(tag).toLowerCase()
+                    )}">${escapeHtml(tag)}</span>`
                 )
                 .join("") +
               `</div>`;
@@ -618,10 +627,10 @@
           div.innerHTML = `
             <a href="${youtubeUrl}" target="_blank">
               <div class="video-thumbnail-container">
-                <img src="${video.thumbnail}" alt="${video.title}" width="320" loading="lazy">
+                <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" width="320" loading="lazy">
                 ${durationHtml}
               </div>
-              <p class="video-title">${video.title}</p>
+              <p class="video-title">${escapeHtml(video.title)}</p>
               ${viewCountHtml}
               <p class="video-meta">
                 (${video.year}${
