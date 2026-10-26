@@ -22,6 +22,8 @@
     "search_results_title": "Search Results",
     "back_to_home_button": "← Back to Home",
     "search_input_placeholder": "Enter stream title keywords to search...",
+    "sort_newest": "Newest first",
+    "sort_oldest": "Oldest first",
     "no_matching_streams": "No matching streams found.",
     "found_results_prefix": "Found",
     "found_results_suffix": "results.",

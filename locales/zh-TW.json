@@ -23,6 +23,8 @@
 
     "back_to_home_button": "← 回首頁",
     "search_input_placeholder": "輸入直播標題關鍵字搜尋...",
+    "sort_newest": "最新上傳",
+    "sort_oldest": "最舊上傳",
     "no_matching_streams": "沒有找到符合條件的直播。",
     "found_results_prefix": "共找到",
     "found_results_suffix": "筆結果。",

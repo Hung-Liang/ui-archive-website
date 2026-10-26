@@ -23,6 +23,8 @@
 
     "back_to_home_button": "← ホームに戻る",
     "search_input_placeholder": "配信タイトルのキーワードを入力してください...",
+    "sort_newest": "新しい順",
+    "sort_oldest": "古い順",
     "no_matching_streams": "該当する配信は見つかりませんでした。",
     "found_results_prefix": "",
     "found_results_suffix": "件の結果が見つかりました。",
