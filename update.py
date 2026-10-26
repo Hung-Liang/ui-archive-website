@@ -222,7 +222,7 @@ def get_save_path(category, sub_category, year, month):
     return f"data/{category}/{sub_category}/{year}/{month:02d}.json"
 
 
-def atomic_save_json(data, filepath):
+def atomic_save_json(data, filepath, compact=False):
     """
     Saves JSON data atomically to prevent file corruption during
     unexpected termination.
@@ -232,7 +232,10 @@ def atomic_save_json(data, filepath):
     fd, temp_path = tempfile.mkstemp(dir=dir_path, suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            if compact:
+                json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+            else:
+                json.dump(data, f, ensure_ascii=False, indent=2)
         os.replace(temp_path, filepath)
     except BaseException:
         os.remove(temp_path)
@@ -423,24 +426,28 @@ def generate_all_videos_index():
                             month,
                         )
                         for video in videos_in_month:
-                            all_videos_data.append(
-                                {
-                                    "title": video["title"],
-                                    "videoId": video["videoId"],
-                                    "publishedAt": video["publishedAt"],
-                                    "channelTitle": video["channelTitle"],
-                                    "thumbnail": video["thumbnail"],
-                                    "category": category_folder,
-                                    "subCategory": sub_category_folder,
-                                    "year": int(year_folder),
-                                    "month": month,
-                                    "tags": video.get(
-                                        "tags", []
-                                    ),  # Include tags field
-                                    "duration": video.get("duration", ""),
-                                    "viewCount": video.get("viewCount", "0"),
-                                }
-                            )
+                            entry = {
+                                "title": video["title"],
+                                "videoId": video["videoId"],
+                                "publishedAt": video["publishedAt"],
+                                "category": category_folder,
+                                "subCategory": sub_category_folder,
+                                "year": int(year_folder),
+                                "month": month,
+                                "duration": video.get("duration", ""),
+                                "viewCount": video.get("viewCount", "0"),
+                            }
+                            # Omit fields the frontend can derive to keep
+                            # the search index small
+                            thumbnail = video.get("thumbnail", "")
+                            if thumbnail and thumbnail != (
+                                "https://i.ytimg.com/vi/"
+                                f"{video['videoId']}/hqdefault.jpg"
+                            ):
+                                entry["thumbnail"] = thumbnail
+                            if video.get("tags"):
+                                entry["tags"] = video["tags"]
+                            all_videos_data.append(entry)
     all_videos_data.sort(
         key=lambda x: datetime.fromisoformat(
             x["publishedAt"].replace("Z", "+00:00")
@@ -449,7 +456,7 @@ def generate_all_videos_index():
     )
 
     index_path = os.path.join(base_data_path, "all_videos_index.json")
-    atomic_save_json(all_videos_data, index_path)
+    atomic_save_json(all_videos_data, index_path, compact=True)
     print(
         f"Generated {len(all_videos_data)} entries in all_videos_index.json."
     )
