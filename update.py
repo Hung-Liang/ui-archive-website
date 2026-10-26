@@ -2,7 +2,7 @@ import json
 import os
 import re
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 
 import requests
 
@@ -457,7 +457,7 @@ def generate_all_videos_index():
 
 def update_last_update_date():
     """Updates the last update date to the file."""
-    today = datetime.now().strftime("%Y-%m-%d %H:%M")
+    today = datetime.now(timezone.utc).isoformat(timespec="minutes")
     atomic_save_json({"last_update": today}, LAST_UPDATE_FILE)
     print(f"Last update date updated to: {today}")
 

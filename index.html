@@ -698,6 +698,23 @@
             applyTranslations();
           });
 
+        function formatLastUpdate(value) {
+          // Older data has no timezone; it was written in UTC by GitHub Actions
+          const hasTimezone = /(Z|[+-]\d{2}:?\d{2})$/i.test(value);
+          const date = new Date(hasTimezone ? value : value.replace(" ", "T") + "Z");
+          if (isNaN(date)) {
+            return value;
+          }
+          return date.toLocaleString(undefined, {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          });
+        }
+
         fetch("data/last_update.json")
           .then((res) => {
             if (!res.ok) {
@@ -707,7 +724,7 @@
           })
           .then((data) => {
             if (data && data.last_update) {
-              lastUpdateDateSpan.textContent = data.last_update;
+              lastUpdateDateSpan.textContent = formatLastUpdate(data.last_update);
             } else {
               lastUpdateDateSpan.textContent = "Unable to load";
               lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
