@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ui-archive-v3';
+const CACHE_NAME = 'ui-archive-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -7,6 +7,7 @@ const ASSETS = [
   './asset/thumbnail_placeholder.svg',
   './scripts/theme.js',
   './scripts/render.js',
+  './styles/main.css',
   './scripts/language.js',
   './data/index.json',
   './data/all_videos_index.json',
