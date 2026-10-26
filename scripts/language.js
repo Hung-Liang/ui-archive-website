@@ -44,14 +44,24 @@ async function loadTranslations() {
     }
 }
 
+// Fill {name} placeholders from the element's data-i18n-vars JSON
+function fillVariables(element, text) {
+    const rawVars = element.getAttribute("data-i18n-vars");
+    if (!rawVars) {
+        return text;
+    }
+    const vars = JSON.parse(rawVars);
+    return text.replace(/\{(\w+)\}/g, (match, name) => (name in vars ? vars[name] : match));
+}
+
 function applyTranslations() {
     document.querySelectorAll("[data-i18n]").forEach((element) => {
         const key = element.getAttribute("data-i18n");
         if (translations[currentLanguage] && translations[currentLanguage][key]) {
-            element.textContent = translations[currentLanguage][key];
+            element.textContent = fillVariables(element, translations[currentLanguage][key]);
         } else if (translations["en"] && translations["en"][key]) {
             // Fallback to English
-            element.textContent = translations["en"][key];
+            element.textContent = fillVariables(element, translations["en"][key]);
         }
     });
 

@@ -43,5 +43,8 @@
     "month_9": "Sep.",
     "month_10": "Oct.",
     "month_11": "Nov.",
-    "month_12": "Dec."
+    "month_12": "Dec.",
+    "archive_summary": "{count} months of archives since {year}.",
+    "month_heading": "{year} / {month}",
+    "video_count": "{count} videos"
 }

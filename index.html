@@ -45,227 +45,72 @@
         });
       }
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles/main.css" />
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-        background-color: #f4f4f4;
-        color: #333;
+      /* Month index: one row per year, the year label beside its months */
+      .year-row {
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        align-items: start;
+        gap: 16px;
+        padding: 12px 0;
+        border-top: 1px solid var(--rule);
       }
-      .container {
-        max-width: 960px;
-        margin: 0 auto;
-        background-color: #fff;
-        padding: 20px 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        position: relative; /* For positioning absolute elements inside */
-        min-height: calc(
-          100vh - 40px
-        ); /* Ensure container is tall enough for footer positioning */
-        box-sizing: border-box; /* Include padding in height calculation */
-      }
-      h1 {
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 30px;
-        border-bottom: 2px solid #eee;
-        padding-bottom: 10px;
-      }
-      h2 {
-        /* Category titles */
-        color: #34495e;
-        margin-top: 25px;
-        padding-bottom: 5px;
-        border-bottom: 1px solid #eee;
-      }
-      h3 {
-        /* Sub-category titles */
-        color: #2980b9;
-        margin-top: 15px;
+      .year-label {
+        margin: 0;
+        line-height: var(--control-height);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
       }
       ul {
         list-style: none;
         padding: 0;
-        margin-bottom: 20px;
-        display: flex; /* Make months horizontal */
-        flex-wrap: wrap; /* Allow wrapping */
-        gap: 10px; /* Space between months */
-      }
-      li {
-        background-color: #ecf0f1;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        padding: 8px 12px;
-        transition: background-color 0.3s ease;
-      }
-      li:hover {
-        background-color: #dbe3e7;
-      }
-      a {
-        text-decoration: none;
-        color: #2c3e50;
-        font-weight: bold;
-      }
-      a:hover {
-        color: #3498db;
-      }
-      .action-button {
+        margin: 0;
         display: flex;
-        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      li a {
+        display: inline-flex;
         align-items: center;
-        padding: 8px 15px;
-        background-color: #3498db;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 0.9em;
+        justify-content: center;
+        min-width: 64px;
+        height: var(--control-height);
+        padding: 0 12px;
+        box-sizing: border-box;
+        border-radius: var(--radius-control);
+        background-color: var(--raised);
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+        transition:
+          background-color 0.15s ease,
+          color 0.15s ease;
+      }
+      li a:hover {
+        background-color: var(--accent-soft);
+        color: var(--accent-ink);
+      }
+      #list > ul {
+        margin-top: 8px;
       }
 
-      /* Search Button Specific Styles */
-      .search-button {
-        background-color: #f0ad4e; /* orange color */
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 8px 12px;
-        cursor: pointer;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 0.9em;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-      }
-      .search-button:hover {
-        background-color: #ec971f;
-        transform: translateY(-2px);
-      }
-      .search-button:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      }
-      .search-button .icon {
-        font-size: 1.2em; /* magnifying glass icon size */
-      }
-      /* Search Input Pop-up Styles */
-      #search-popup-overlay {
-        display: none; /* Hidden by default */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 100;
-        justify-content: center;
-        align-items: center;
-      }
-      #search-popup-content {
-        background: #fff;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        text-align: center;
-        width: 90%;
-        max-width: 400px;
-        position: relative;
-      }
-      #search-popup-content input {
-        width: calc(100% - 20px);
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1em;
-      }
-      #search-popup-content button {
-        padding: 10px 20px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-      #search-popup-content button:hover {
-        background-color: #2980b9;
-      }
-      #close-search-popup {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 1.5em;
-        cursor: pointer;
-        color: #aaa;
-      }
-      #close-search-popup:hover {
-        color: #333;
-      }
-      .skeleton-title {
-        height: 30px;
-        margin-top: 25px;
-        margin-bottom: 15px;
-        border-radius: 4px;
-        animation: skeleton-loading 1s linear infinite alternate;
-      }
-      .skeleton-pill {
-        width: 60px; 
-        height: 35px; 
-        border-radius: 5px; 
-        background-color: #e2e5e7;
-        animation: skeleton-loading 1s linear infinite alternate;
-      }
-
-      /* Mobile Responsive Optimizations */
       @media (max-width: 600px) {
-        body {
-          margin: 10px;
-        }
-        .container {
-          padding: 15px 20px;
-          min-height: calc(100vh - 20px);
-        }
-        .language-selector {
-          position: static;
-          text-align: center;
-          margin-bottom: 10px;
-        }
-        .top-right-buttons {
-          position: static;
-          justify-content: center;
-          margin-bottom: 20px;
-          flex-wrap: wrap;
-        }
-        h1 {
-          font-size: 1.5em;
-          margin-bottom: 20px;
-        }
-        ul {
-          gap: 15px;
+        .year-row {
+          grid-template-columns: 1fr;
+          gap: 8px;
         }
         li {
-          padding: 12px 20px; /* Larger tap target */
           flex-grow: 1;
-          text-align: center;
         }
-        .footer-info {
-          position: static;
-          transform: none;
+        li a {
           width: 100%;
-          flex-direction: column;
-          gap: 10px;
-          margin-top: 30px;
-          text-align: center;
-        }
-        .last-update-info, .developer-info {
-          text-align: center;
+          height: 44px; /* Larger tap target */
         }
       }
     </style>
@@ -287,32 +132,47 @@
     />
 
     <div class="container">
-      <div class="language-selector">
-        <select id="language-select"></select>
-      </div>
+      <header class="top-bar">
+        <div class="top-bar-start">
+          <a href="index.html" class="brand">
+            <img src="./asset/icon.png" alt="" width="28" height="28" />
+            しぐれうい
+          </a>
+        </div>
+        <div class="top-bar-actions">
+          <div class="language-selector">
+            <select id="language-select" aria-label="Language"></select>
+          </div>
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            title="切換深色模式"
+            aria-label="切換深色模式"
+          ></button>
+          <a href="index.html" class="action-button" data-i18n="home_button"
+            >Home</a
+          >
+          <button id="open-search-popup" class="search-button">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+            <span data-i18n="search_stream_button">Search Stream</span>
+          </button>
+        </div>
+      </header>
 
-      <div class="top-right-buttons">
-        <button id="theme-toggle" class="theme-toggle-btn" title="切換深色模式">🌙</button>
-        <button id="open-search-popup" class="search-button">
-          <span class="icon">🔍</span>
-          <span data-i18n="search_stream_button">Search Stream</span>
-        </button>
-        <a href="index.html" class="action-button" data-i18n="home_button"
-          >Home</a
-        >
+      <div class="page-title">
+        <h1 data-i18n="main_title">しぐれうい</h1>
+        <p id="archive-summary" class="page-subtitle"></p>
       </div>
-
-      <h1 data-i18n="main_title">しぐれうい</h1>
       <div id="list">
         <!-- Skeleton Loaders -->
-        <div class="skeleton-title" style="width: 30%;"></div>
+        <div class="skeleton-title" style="width: 30%; margin-top: 48px;"></div>
         <div class="skeleton-title" style="width: 15%; height: 20px; margin-top: 15px;"></div>
         <ul>
           <li class="skeleton-pill"></li>
           <li class="skeleton-pill"></li>
           <li class="skeleton-pill"></li>
         </ul>
-        <div class="skeleton-title" style="width: 30%; margin-top: 40px;"></div>
+        <div class="skeleton-title" style="width: 30%; margin-top: 48px;"></div>
         <div class="skeleton-title" style="width: 15%; height: 20px; margin-top: 15px;"></div>
         <ul>
           <li class="skeleton-pill"></li>
@@ -335,7 +195,7 @@
 
     <div id="search-popup-overlay">
       <div id="search-popup-content">
-        <span id="close-search-popup">×</span>
+        <span id="close-search-popup" role="button" aria-label="Close">×</span>
         <h2 data-i18n="search_stream_popup_title">Search Stream</h2>
         <input
           type="text"
@@ -343,7 +203,11 @@
           data-i18n-placeholder="search_stream_placeholder"
           placeholder="Please enter stream title keywords"
         />
-        <button id="perform-search-button" data-i18n="start_search_button">
+        <button
+          id="perform-search-button"
+          class="search-button"
+          data-i18n="start_search_button"
+        >
           Start Search
         </button>
       </div>
@@ -433,11 +297,13 @@
                 const years = Object.keys(yearsData).sort((a, b) => b - a); // Sort years descending
 
                 years.forEach((year) => {
+                  const yearRow = document.createElement("div");
+                  yearRow.className = "year-row";
                   const yearText = document.createElement("p"); // Use p tag for year for now, can be h4
+                  yearText.className = "year-label";
                   yearText.textContent = `${year}`;
-                  yearText.style.fontWeight = "bold";
-                  yearText.style.marginTop = "10px";
-                  container.appendChild(yearText);
+                  yearRow.appendChild(yearText);
+                  container.appendChild(yearRow);
 
                   const ul = document.createElement("ul");
                   yearsData[year]
@@ -453,19 +319,35 @@
                       )}</a>`;
                       ul.appendChild(li);
                     });
-                  container.appendChild(ul);
+                  yearRow.appendChild(ul);
                 });
               });
             });
+
+            let monthCount = 0;
+            let firstYear = Infinity;
+            Object.values(index).forEach((subCategories) => {
+              Object.values(subCategories).forEach((yearsData) => {
+                Object.entries(yearsData).forEach(([year, months]) => {
+                  monthCount += months.length;
+                  firstYear = Math.min(firstYear, Number(year));
+                });
+              });
+            });
+            if (monthCount > 0) {
+              const summary = document.getElementById("archive-summary");
+              summary.setAttribute("data-i18n", "archive_summary");
+              summary.setAttribute(
+                "data-i18n-vars",
+                JSON.stringify({ year: firstYear, count: monthCount }),
+              );
+            }
             applyTranslations(); // Apply translations after dynamic content is added
           })
           .catch((error) => {
             console.error("Error fetching index.json:", error);
-            document.getElementById("list").textContent =
-              "Unable to load history data, please try again later.";
-            document
-              .getElementById("list")
-              .setAttribute("data-i18n", "history_data_error");
+            document.getElementById("list").innerHTML =
+              "<p class='list-message error' data-i18n='history_data_error'>Unable to load history data, please try again later.</p>";
             applyTranslations();
           });
 
@@ -534,21 +416,10 @@
             )}`;
           } else {
             const messageBox = document.createElement("div");
-            messageBox.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background-color: white;
-                padding: 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-                z-index: 1000;
-                text-align: center;
-            `;
+            messageBox.className = "message-box";
             messageBox.innerHTML = `
                 <p data-i18n="enter_keywords_message">Please enter stream title keywords!</p>
-                <button onclick="this.parentNode.remove()" style="padding: 8px 15px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;" data-i18n="ok_button">OK</button>
+                <button class="search-button" onclick="this.parentNode.remove()" data-i18n="ok_button">OK</button>
             `;
             document.body.appendChild(messageBox);
             applyTranslations(); // Apply translations to the message box

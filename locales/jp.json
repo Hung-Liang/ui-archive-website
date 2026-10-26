@@ -44,5 +44,8 @@
     "month_9": "九月",
     "month_10": "十月",
     "month_11": "十一月",
-    "month_12": "十二月"
+    "month_12": "十二月",
+    "archive_summary": "{year}年から{count}か月分のアーカイブ。",
+    "month_heading": "{year}年{month}月",
+    "video_count": "{count}本の動画"
 }

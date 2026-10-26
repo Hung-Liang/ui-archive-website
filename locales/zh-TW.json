@@ -44,5 +44,8 @@
     "month_9": "九月",
     "month_10": "十月",
     "month_11": "十一月",
-    "month_12": "十二月"
+    "month_12": "十二月",
+    "archive_summary": "自 {year} 年起共 {count} 個月份的存檔。",
+    "month_heading": "{year} 年 {month} 月",
+    "video_count": "{count} 部影片"
 }

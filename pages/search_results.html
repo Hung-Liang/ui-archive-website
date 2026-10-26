@@ -44,194 +44,45 @@
       }
     </script>
     <script src="../scripts/theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../styles/main.css" />
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background-color: #f4f4f4;
-        color: #333;
-      }
-      .container {
-        max-width: 960px;
-        margin: 20px auto;
-        background-color: #fff;
-        padding: 20px 30px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        position: relative;
-        min-height: calc(100vh - 40px);
-        box-sizing: border-box;
-      }
-
-      /* Buttons */
-      .back-to-prev-button {
-        position: absolute;
-        top: 20px;
-        left: 30px;
-        display: inline-block;
-        padding: 8px 15px;
-        background-color: #6c757d;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 0.9em;
-        z-index: 10;
-      }
-      .back-to-prev-button:hover {
-        background-color: #5a6268;
-        transform: translateY(-2px);
-      }
-      .back-to-prev-button:active {
-        transform: translateY(0);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      }
-      .action-button {
-        display: inline-block;
-        padding: 8px 15px;
-        background-color: #3498db;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s ease, transform 0.2s ease;
-        font-weight: bold;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        font-size: 0.9em;
-      }
-
-      /* Search Specific Styles */
-      #search-input-container {
-        margin-top: 50px; /* Space for top buttons */
-        text-align: center;
-        margin-bottom: 20px;
-      }
-      #search-input {
-        width: 80%;
-        max-width: 500px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1em;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
-      #sort-select {
-        display: block;
-        margin: 10px auto 0;
-        padding: 8px 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 1em;
-      }
-
-      /* Video List Styles */
-      #video-list {
-        /* No longer a direct grid, content is grouped within */
-        padding: 20px 0;
-      }
-      .video-group {
-        margin-bottom: 30px;
-      }
-      .video-group h2 {
-        color: #34495e;
-        margin-top: 25px;
-        padding-bottom: 5px;
-        border-bottom: 2px solid #eee; /* Stronger border for categories */
-      }
-      .video-group h3 {
-        color: #2980b9;
-        margin-top: 15px;
-        padding-bottom: 3px;
-        border-bottom: 1px solid #eee; /* Lighter border for sub-categories */
-      }
-      .video-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-        gap: 20px;
-        padding-top: 10px;
-      }
-
-      .video-item {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        transition: transform 0.2s ease-in-out;
-      }
-      .video-item:hover {
-        transform: translateY(-5px);
-      }
-      .video-item a {
-        display: block;
-        padding-bottom: 10px;
-        color: inherit;
-        text-decoration: none;
-      }
-      .video-item img {
-        max-width: 100%;
-        height: auto;
-        border-bottom: 1px solid #eee;
-        margin-bottom: 10px;
-      }
-      .video-item .video-title {
-        font-weight: bold;
-        padding: 0 10px;
-        margin-bottom: 5px;
-        color: #333;
-      }
-      .video-item .video-meta {
-        font-size: 0.85em;
-        color: #777;
-        padding: 0 10px;
-        margin-top: -3px;
-        margin-bottom: 5px;
-      }
-      .video-item .video-date {
-        font-size: 0.9em;
-        color: #666;
-        padding: 0 10px;
-      }
-      .video-item .video-tags {
-        padding: 5px 10px 10px;
-        font-size: 0.8em;
-        color: #555;
+      .search-toolbar {
+        margin-top: 20px;
         display: flex;
         flex-wrap: wrap;
-        justify-content: center;
-        gap: 5px;
+        gap: 8px;
       }
-      .video-item .video-tags span {
-        background-color: #e0e0e0;
-        padding: 3px 8px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s ease;
+      #search-input {
+        flex: 1 1 320px;
+        max-width: 480px;
       }
-      .video-item .video-tags span:hover {
-        background-color: #c0c0c0;
+      #search-results-info {
+        margin: 16px 0 0;
+        color: var(--muted);
       }
-      .skeleton-card {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        height: 280px;
+      .video-group h2 {
+        margin-top: 40px;
       }
-      .skeleton-image {
-        height: 180px;
-        width: 100%;
-        animation: skeleton-loading 1s linear infinite alternate;
+      .video-subgroup h3 {
+        margin: 16px 0 16px;
       }
-      .skeleton-text {
-        height: 15px;
-        margin: 10px;
-        border-radius: 4px;
-        animation: skeleton-loading 1s linear infinite alternate;
+      .video-subgroup + .video-subgroup {
+        margin-top: 32px;
+      }
+
+      @media (max-width: 600px) {
+        #search-input,
+        #sort-select {
+          flex-basis: 100%;
+          max-width: none;
+          height: 44px;
+        }
       }
     </style>
   </head>
@@ -252,38 +103,49 @@
     />
 
     <div class="container">
-      <div class="language-selector">
-        <select id="language-select"></select>
+      <header class="top-bar">
+        <div class="top-bar-start">
+          <a
+            href="../index.html"
+            class="back-to-prev-button"
+            data-i18n="back_to_home_button"
+            >← Back to Home</a
+          >
+          <a href="../index.html" class="brand">
+            <img src="../asset/icon.png" alt="" width="28" height="28" />
+            しぐれうい
+          </a>
+        </div>
+        <div class="top-bar-actions">
+          <div class="language-selector">
+            <select id="language-select" aria-label="Language"></select>
+          </div>
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            title="Toggle Dark Mode"
+            aria-label="Toggle Dark Mode"
+          ></button>
+        </div>
+      </header>
+
+      <div class="page-title">
+        <h1 data-i18n="search_results_title">Search Results</h1>
+        <div id="search-input-container" class="search-toolbar">
+          <input
+            type="text"
+            id="search-input"
+            data-i18n-placeholder="search_input_placeholder"
+            placeholder="Enter stream title keywords to search..."
+            aria-label="Search"
+          />
+          <select id="sort-select" aria-label="Sort">
+            <option value="newest" data-i18n="sort_newest">Newest first</option>
+            <option value="oldest" data-i18n="sort_oldest">Oldest first</option>
+          </select>
+        </div>
+        <p id="search-results-info"></p>
       </div>
-
-      <a
-        href="../index.html"
-        class="back-to-prev-button"
-        data-i18n="back_to_home_button"
-        >← Back to Home</a
-      >
-
-      <div class="top-right-buttons">
-        <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Dark Mode">🌙</button>
-      </div>
-
-      <div id="search-input-container">
-        <input
-          type="text"
-          id="search-input"
-          data-i18n-placeholder="search_input_placeholder"
-          placeholder="Enter stream title keywords to search..."
-        />
-        <select id="sort-select">
-          <option value="newest" data-i18n="sort_newest">Newest first</option>
-          <option value="oldest" data-i18n="sort_oldest">Oldest first</option>
-        </select>
-      </div>
-
-      <div
-        id="search-results-info"
-        style="text-align: center; margin-bottom: 20px; color: #555"
-      ></div>
 
       <div id="video-list">
         <!-- Skeleton Loaders -->
@@ -472,7 +334,7 @@
           videoListContainer.innerHTML = "";
 
           if (results.length === 0) {
-            videoListContainer.innerHTML = `<p style='text-align: center; margin-top: 50px;' data-i18n="no_matching_streams">No matching streams found.</p>`;
+            videoListContainer.innerHTML = `<p class='list-message' data-i18n="no_matching_streams">No matching streams found.</p>`;
             searchResultsInfo.textContent = `${translations[currentLanguage]["found_results_prefix"]} 0 ${translations[currentLanguage]["found_results_suffix"]}`;
             applyTranslations(); // Apply translations after updating text
             return;
@@ -654,7 +516,7 @@
           })
           .catch((error) => {
             console.error("Error fetching all_videos_index.json:", error);
-            videoListContainer.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_search_data">Unable to load search data, please try again later.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
+            videoListContainer.innerHTML = `<p class='list-message error'><span data-i18n="unable_to_load_search_data">Unable to load search data, please try again later.</span><br>Error: ${escapeHtml(error.message)}</p>`;
             applyTranslations(); // Apply translations after updating text
           });
 

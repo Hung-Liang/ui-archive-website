@@ -6,6 +6,28 @@ const month = String(params.get("m")).padStart(2, "0");
 
 // Removed tag popup related elements and logic as it's now handled by redirection to search_results.html
 
+const SUB_CATEGORY_KEYS = { normal: "stream_category", member: "member_only_category" };
+
+// Title and scope are i18n templates, so a language switch re-renders them
+function renderMonthHeading(videoCount) {
+    const title = document.getElementById("month-title");
+    title.setAttribute("data-i18n", "month_heading");
+    title.setAttribute("data-i18n-vars", JSON.stringify({ year, month: Number(month) }));
+
+    const scope = document.getElementById("month-scope");
+    if (SUB_CATEGORY_KEYS[subCategory]) {
+        scope.setAttribute("data-i18n", SUB_CATEGORY_KEYS[subCategory]);
+    }
+
+    if (videoCount !== undefined) {
+        const count = document.getElementById("month-count");
+        count.setAttribute("data-i18n", "video_count");
+        count.setAttribute("data-i18n-vars", JSON.stringify({ count: videoCount }));
+        count.before(" · ");
+    }
+    applyTranslations();
+}
+
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, "&amp;")
@@ -75,8 +97,9 @@ function loadMonthVideos() {
         .then((videos) => {
             const container = document.getElementById("video-list");
             container.innerHTML = ""; // Clear skeleton loaders
+            renderMonthHeading(videos.length);
             if (videos.length === 0) {
-                container.innerHTML = `<p style='text-align: center; margin-top: 50px;' data-i18n="no_videos_this_month">No videos available for this month.</p>`;
+                container.innerHTML = `<p class='list-message' data-i18n="no_videos_this_month">No videos available for this month.</p>`;
                 applyTranslations(); // Apply translations to the new content
                 return;
             }
@@ -88,7 +111,8 @@ function loadMonthVideos() {
         .catch((error) => {
             console.error("Error fetching or parsing video data:", error);
             const container = document.getElementById("video-list");
-            container.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_video_data">Unable to load video data for this month.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
+            renderMonthHeading();
+            container.innerHTML = `<p class='list-message error'><span data-i18n="unable_to_load_video_data">Unable to load video data for this month.</span><br>Error: ${escapeHtml(error.message)}</p>`;
             applyTranslations(); // Apply translations to the error message
         });
 }
