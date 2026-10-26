@@ -306,7 +306,7 @@
 
           const durationHtml = video.duration ? `<span class="video-duration">${video.duration}</span>` : "";
           const viewCountText = (translations[currentLanguage] && translations[currentLanguage]["view_count"]) || "views";
-          const viewCountHtml = video.viewCount ? `<p class="video-view-count">${Number(video.viewCount).toLocaleString()} ${viewCountText}</p>` : "";
+          const viewCountHtml = video.viewCount && video.subCategory !== "member" ?`<p class="video-view-count">${Number(video.viewCount).toLocaleString()} ${viewCountText}</p>` : "";
 
           div.innerHTML = `
             <a href="${youtubeUrl}" target="_blank">

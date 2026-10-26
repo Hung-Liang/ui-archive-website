@@ -54,7 +54,7 @@ function renderVideoItem(video) {
 
     const durationHtml = video.duration ? `<span class="video-duration">${video.duration}</span>` : "";
     const viewCountText = (translations[currentLanguage] && translations[currentLanguage]["view_count"]) || "views";
-    const viewCountHtml = video.viewCount ? `<p class="video-view-count">${Number(video.viewCount).toLocaleString()} <span data-i18n="view_count">${viewCountText}</span></p>` : "";
+    const viewCountHtml = video.viewCount && subCategory !== "member" ?`<p class="video-view-count">${Number(video.viewCount).toLocaleString()} <span data-i18n="view_count">${viewCountText}</span></p>` : "";
 
     div.innerHTML = `
         <a href="${youtubeUrl}" target="_blank">
