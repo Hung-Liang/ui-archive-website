@@ -27,6 +27,22 @@
     <meta name="twitter:description" content="Stream of the Month - Shigure Ui YouTube Archive." />
     <meta name="twitter:image" content="https://ui-archive-website.bobing.dev/asset/icon.png" />
     <link rel="icon" href="../asset/icon.png" type="image/png" />
+    <link rel="manifest" href="../manifest.json" />
+    <meta name="theme-color" content="#333333" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("../sw.js")
+            .then((registration) => {
+              console.log("Service Worker registered with scope:", registration.scope);
+            })
+            .catch((error) => {
+              console.log("Service Worker registration failed:", error);
+            });
+        });
+      }
+    </script>
     <script src="../scripts/theme.js"></script>
     <style>
       /* Injected CSS from render.js to prevent FOUC */

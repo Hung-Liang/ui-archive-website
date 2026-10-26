@@ -1,6 +1,8 @@
 // scripts/theme.js
 const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'dark-mode') {
+// Without a saved preference, follow the OS setting
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (savedTheme === 'dark-mode' || (savedTheme === null && prefersDark)) {
     document.documentElement.classList.add('dark-mode');
 }
 

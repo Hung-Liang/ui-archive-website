@@ -1,9 +1,10 @@
-const CACHE_NAME = 'ui-archive-v2';
+const CACHE_NAME = 'ui-archive-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './asset/icon.png',
+  './asset/thumbnail_placeholder.svg',
   './scripts/theme.js',
   './scripts/render.js',
   './scripts/language.js',

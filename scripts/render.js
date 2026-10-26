@@ -37,7 +37,7 @@ function renderVideoItem(video) {
     div.innerHTML = `
         <a href="${youtubeUrl}" target="_blank">
             <div class="video-thumbnail-container">
-                <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" width="320" loading="lazy">
+                <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" width="320" loading="lazy" onerror="this.onerror=null;this.src='../asset/thumbnail_placeholder.svg'">
                 ${durationHtml}
             </div>
             <p class="video-title">${escapeHtml(video.title)}</p>

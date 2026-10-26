@@ -27,6 +27,22 @@
     <meta name="twitter:description" content="Search Results - Shigure Ui YouTube Archive." />
     <meta name="twitter:image" content="https://ui-archive-website.bobing.dev/asset/icon.png" />
     <link rel="icon" href="../asset/icon.png" type="image/png" />
+    <link rel="manifest" href="../manifest.json" />
+    <meta name="theme-color" content="#333333" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("../sw.js")
+            .then((registration) => {
+              console.log("Service Worker registered with scope:", registration.scope);
+            })
+            .catch((error) => {
+              console.log("Service Worker registration failed:", error);
+            });
+        });
+      }
+    </script>
     <script src="../scripts/theme.js"></script>
     <style>
       body {
@@ -645,7 +661,7 @@
           div.innerHTML = `
             <a href="${youtubeUrl}" target="_blank">
               <div class="video-thumbnail-container">
-                <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" width="320" loading="lazy">
+                <img src="${video.thumbnail}" alt="${escapeHtml(video.title)}" width="320" loading="lazy" onerror="this.onerror=null;this.src='../asset/thumbnail_placeholder.svg'">
                 ${durationHtml}
               </div>
               <p class="video-title">${escapeHtml(video.title)}</p>
