@@ -31,8 +31,8 @@ function renderVideoItem(video) {
     }
 
     const durationHtml = video.duration ? `<span class="video-duration">${video.duration}</span>` : "";
-    const viewCountText = (window.translations[window.currentLanguage] && window.translations[window.currentLanguage]["view_count"]) || "views";
-    const viewCountHtml = video.viewCount ? `<p class="video-view-count">${Number(video.viewCount).toLocaleString()} ${viewCountText}</p>` : "";
+    const viewCountText = (translations[currentLanguage] && translations[currentLanguage]["view_count"]) || "views";
+    const viewCountHtml = video.viewCount ? `<p class="video-view-count">${Number(video.viewCount).toLocaleString()} <span data-i18n="view_count">${viewCountText}</span></p>` : "";
 
     div.innerHTML = `
         <a href="${youtubeUrl}" target="_blank">
@@ -64,29 +64,31 @@ function renderVideoItem(video) {
     return div;
 }
 
-fetch(`../data/${category}/${subCategory}/${year}/${month}.json`)
-    .then((res) => {
-        if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status} for ${res.url}`);
-        }
-        return res.json();
-    })
-    .then((videos) => {
-        const container = document.getElementById("video-list");
-        container.innerHTML = ""; // Clear skeleton loaders
-        if (videos.length === 0) {
-            container.innerHTML = `<p style='text-align: center; margin-top: 50px;' data-i18n="no_videos_this_month">No videos available for this month.</p>`;
-            applyTranslations(); // Apply translations to the new content
-            return;
-        }
+function loadMonthVideos() {
+    return fetch(`../data/${category}/${subCategory}/${year}/${month}.json`)
+        .then((res) => {
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status} for ${res.url}`);
+            }
+            return res.json();
+        })
+        .then((videos) => {
+            const container = document.getElementById("video-list");
+            container.innerHTML = ""; // Clear skeleton loaders
+            if (videos.length === 0) {
+                container.innerHTML = `<p style='text-align: center; margin-top: 50px;' data-i18n="no_videos_this_month">No videos available for this month.</p>`;
+                applyTranslations(); // Apply translations to the new content
+                return;
+            }
 
-        videos.forEach((video) => {
-            container.appendChild(renderVideoItem(video));
+            videos.forEach((video) => {
+                container.appendChild(renderVideoItem(video));
+            });
+        })
+        .catch((error) => {
+            console.error("Error fetching or parsing video data:", error);
+            const container = document.getElementById("video-list");
+            container.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_video_data">Unable to load video data for this month.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
+            applyTranslations(); // Apply translations to the error message
         });
-    })
-    .catch((error) => {
-        console.error("Error fetching or parsing video data:", error);
-        const container = document.getElementById("video-list");
-        container.innerHTML = `<p style='text-align: center; margin-top: 50px; color: red;' data-i18n="unable_to_load_video_data">Unable to load video data for this month.</p><p style='text-align: center; color: red;'>Error: ${error.message}</p>`;
-        applyTranslations(); // Apply translations to the error message
-    });
+}
