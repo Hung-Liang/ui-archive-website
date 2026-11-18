@@ -3,10 +3,13 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import update  # noqa: E402
+
+EXPECTED_LOCATION = ("videos", "normal")
 
 
 def make_video(video_id, published_at, **extra):
@@ -161,6 +164,35 @@ class GenerateAllVideosIndexTest(DataDirTestCase):
             (a["category"], a["subCategory"], a["year"], a["month"]),
             ("videos", "normal", 2026, 1),
         )
+
+
+class CleanUpLocalDataTest(DataDirTestCase):
+    def test_removes_only_videos_missing_from_playlists(self):
+        keep = make_video("keep", "2026-01-05T00:00:00Z")
+        gone = make_video("gone", "2026-01-06T00:00:00Z")
+        path = self.write_month([gone, keep], category="videos")
+        update.clean_up_local_data({"keep": EXPECTED_LOCATION})
+        self.assertEqual(self.read_json(path), [keep])
+
+    def test_removes_videos_moved_to_another_location(self):
+        moved = make_video("moved", "2026-01-05T00:00:00Z")
+        category, sub_category = EXPECTED_LOCATION
+        for location in [("other", sub_category), (category, "member")]:
+            with self.subTest(location=location):
+                path = self.write_month([moved], category=category)
+                update.clean_up_local_data({"moved": location})
+                self.assertEqual(self.read_json(path), [])
+
+
+class InitializeGuardTest(DataDirTestCase):
+    def test_empty_playlist_aborts_before_writing(self):
+        video = make_video("a", "2026-01-05T00:00:00Z")
+        with mock.patch.object(
+            update, "fetch_all_videos_from_playlist", side_effect=[[video], []]
+        ):
+            with self.assertRaises(RuntimeError):
+                update.initialize_all_playlists()
+        self.assertFalse(os.path.exists("data"))
 
 
 if __name__ == "__main__":
