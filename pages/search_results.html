@@ -416,15 +416,27 @@
           // If the query starts with '#', treat it as a tag search
           if (query.startsWith("#")) {
             const tagString = query.substring(1).trim(); // Remove '#' and trim
+            // Some stored tags keep surrounding spaces, so compare them trimmed
+            const isExactTag =
+              tagString !== "" &&
+              allVideosIndexData.some(
+                (video) =>
+                  Array.isArray(video.tags) &&
+                  video.tags.some(
+                    (tag) => String(tag).toLowerCase().trim() === tagString
+                  )
+              );
             // Split by one or more spaces, and then for each part, remove any leading '#' and convert to lowercase
-            const searchTags = tagString
-              .split(/\s+/)
-              .filter((t) => t !== "")
-              .map((t) => {
-                return t.startsWith("#")
-                  ? t.substring(1).toLowerCase()
-                  : t.toLowerCase();
-              });
+            const searchTags = isExactTag
+              ? [tagString]
+              : tagString
+                  .split(/\s+/)
+                  .filter((t) => t !== "")
+                  .map((t) => {
+                    return t.startsWith("#")
+                      ? t.substring(1).toLowerCase()
+                      : t.toLowerCase();
+                  });
 
             if (searchTags.length === 0) {
               renderSearchResults([]);
@@ -440,9 +452,10 @@
                 return false;
               }
               // Convert video's tags to lowercase for case-insensitive comparison
-              const lowerCaseVideoTags = video.tags.map((tag) =>
-                String(tag).toLowerCase()
-              );
+              const lowerCaseVideoTags = video.tags.map((tag) => {
+                const lowerCaseTag = String(tag).toLowerCase();
+                return isExactTag ? lowerCaseTag.trim() : lowerCaseTag;
+              });
               // Check if all searchTags (which are already lowercase) are included in lowerCaseVideoTags
               return searchTags.every((searchTag) =>
                 lowerCaseVideoTags.includes(searchTag)
