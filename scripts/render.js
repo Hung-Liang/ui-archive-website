@@ -28,15 +28,6 @@ function renderMonthHeading(videoCount) {
     applyTranslations();
 }
 
-function escapeHtml(value) {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
 function renderVideoItem(video) {
     const div = document.createElement("div");
     div.className = "video-item";

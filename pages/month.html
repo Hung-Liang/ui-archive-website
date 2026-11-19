@@ -145,6 +145,7 @@
     </div>
 
     <script src="../scripts/language.js"></script>
+    <script src="../scripts/common.js"></script>
     <script src="../scripts/render.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", async () => {
@@ -154,23 +155,6 @@
         loadMonthVideos();
 
         const lastUpdateDateSpan = document.getElementById("last-update-date");
-
-        function formatLastUpdate(value) {
-          // Older data has no timezone; it was written in UTC by GitHub Actions
-          const hasTimezone = /(Z|[+-]\d{2}:?\d{2})$/i.test(value);
-          const date = new Date(hasTimezone ? value : value.replace(" ", "T") + "Z");
-          if (isNaN(date)) {
-            return value;
-          }
-          return date.toLocaleString(undefined, {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-        }
 
         // 載入最後更新日期
         fetch("../data/last_update.json")
