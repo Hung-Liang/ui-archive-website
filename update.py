@@ -578,6 +578,38 @@ def clean_up_local_data(all_fetched_video_metadata, remove_missing=True):
     print(f"Clean-up complete. Removed {removed_count} orphaned or misplaced video entries.")
 
 
+def count_stored_videos(category, sub_category):
+    """Counts the distinct videos stored under a category and sub-category."""
+    if not os.path.exists("data"):
+        return 0
+
+    video_ids = set()
+    for stored_category, stored_sub_category, year, month, _ in iter_month_files():
+        if (stored_category, stored_sub_category) == (category, sub_category):
+            video_ids.update(
+                v["videoId"]
+                for v in load_existing_videos(
+                    stored_category, stored_sub_category, year, month
+                )
+            )
+    return len(video_ids)
+
+
+def check_fetched_count(videos, category, sub_category, playlist_id):
+    """
+    Raises if a full sync would remove too many stored videos: under 90% of
+    them fetched and more than 5 missing. Small playlists may shrink freely.
+    """
+    stored_count = count_stored_videos(category, sub_category)
+    fetched_count = len({v["videoId"] for v in videos})
+    if fetched_count * 10 < stored_count * 9 and stored_count - fetched_count > 5:
+        raise RuntimeError(
+            f"Playlist {playlist_id} ('{category}' -> '{sub_category}') "
+            f"returned {fetched_count} videos but {stored_count} are stored. "
+            "Aborting to prevent data loss."
+        )
+
+
 def initialize_all_playlists():
     """
     Executes initialization, fetching all videos from all playlists.
@@ -615,6 +647,8 @@ def initialize_all_playlists():
                     f"'{sub_category}') returned no videos. "
                     "Aborting to prevent data loss."
                 )
+
+            check_fetched_count(videos, category, sub_category, playlist_id)
 
             # Populate metadata for clean-up
             for v in videos:

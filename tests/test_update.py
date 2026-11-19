@@ -400,6 +400,64 @@ class InitializeGuardTest(DataDirTestCase):
                 update.initialize_all_playlists()
         self.assertFalse(os.path.exists("data"))
 
+    def test_large_drop_aborts_before_writing(self):
+        category, sub_category = EXPECTED_LOCATION
+        stored = [make_video(f"v{i}", "2026-01-05T00:00:00Z") for i in range(20)]
+        path = self.write_month(stored, category=category)
+        with open(path, "rb") as f:
+            before = f.read()
+        playlist_id = update.PLAYLIST_IDS[category][sub_category]
+
+        with mock.patch.object(
+            update,
+            "fetch_all_videos_from_playlist",
+            side_effect=lambda pid, **_: stored[:1],
+        ):
+            with self.assertRaisesRegex(RuntimeError, f"{playlist_id}.*1 videos.*20"):
+                update.initialize_all_playlists()
+
+        with open(path, "rb") as f:
+            self.assertEqual(f.read(), before)
+        self.assertEqual(os.listdir("data"), [category])
+
+    def test_fetched_count_thresholds(self):
+        category, sub_category = EXPECTED_LOCATION
+        for stored_count, fetched_count, blocked in [
+            (20, 1, True),
+            (10, 4, True),
+            (10, 5, False),
+            (100, 89, True),
+            (100, 90, False),
+            (3, 2, False),
+            (0, 1, False),
+        ]:
+            with self.subTest(stored=stored_count, fetched=fetched_count):
+                videos = [
+                    make_video(f"v{i}", "2026-01-05T00:00:00Z")
+                    for i in range(stored_count)
+                ]
+                self.write_month(videos, category=category)
+                fetched = [
+                    make_video(f"v{i}", "2026-01-05T00:00:00Z")
+                    for i in range(fetched_count)
+                ]
+                if blocked:
+                    with self.assertRaises(RuntimeError):
+                        update.check_fetched_count(fetched, category, sub_category, "p")
+                else:
+                    update.check_fetched_count(fetched, category, sub_category, "p")
+
+    def test_duplicate_copies_do_not_raise_the_baseline(self):
+        category, sub_category = EXPECTED_LOCATION
+        videos = [make_video(f"v{i}", "2026-01-05T00:00:00Z") for i in range(8)]
+        self.write_month(videos, category=category, month=1)
+        self.write_month(videos, category=category, month=2)
+        update.check_fetched_count(videos[:7], category, sub_category, "p")
+
+    def test_first_sync_without_data_is_allowed(self):
+        video = make_video("a", "2026-01-05T00:00:00Z")
+        update.check_fetched_count([video], *EXPECTED_LOCATION, "p")
+
 
 class SiteTimezoneMonthTest(DataDirTestCase):
     def test_month_uses_site_timezone(self):
