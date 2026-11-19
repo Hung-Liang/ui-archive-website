@@ -140,6 +140,108 @@ class SaveJsonMergedTest(DataDirTestCase):
         self.assertEqual(os.listdir(folder), ["01.json"])
 
 
+class KeepStoredFieldsTest(DataDirTestCase):
+    def api_video(self, video_id, published_at, **fields):
+        video = make_video(video_id, published_at, **fields)
+        for field in ("thumbnail", "duration", "viewCount"):
+            if field not in fields:
+                del video[field]
+        return video
+
+    def test_fetch_details_omits_what_the_api_did_not_return(self):
+        response = mock.Mock()
+        response.json.return_value = {
+            "items": [
+                {"id": "a", "contentDetails": {"duration": "P0D"}, "statistics": {}},
+                {"id": "b", "contentDetails": {"duration": "PT10M"},
+                 "statistics": {"viewCount": "7"}},
+            ]
+        }
+        with mock.patch.object(update.requests, "get", return_value=response):
+            details = update.fetch_video_details(["a", "b"])
+        self.assertEqual(
+            details, {"a": {}, "b": {"duration": "10:00", "viewCount": "7"}}
+        )
+
+    def test_build_video_omits_missing_details(self):
+        item = {
+            "snippet": {
+                "title": "t",
+                "description": "",
+                "channelTitle": "c",
+                "publishedAt": "2026-01-05T00:00:00Z",
+                "thumbnails": {},
+            },
+            "contentDetails": {"videoId": "a"},
+        }
+        video = update.build_video(item, {}, "playlist", True)
+        for field in ("thumbnail", "duration", "viewCount"):
+            self.assertNotIn(field, video)
+
+    def test_missing_fields_keep_stored_values(self):
+        stored = make_video("a", "2026-01-05T00:00:00Z", title="old")
+        path = self.write_month([stored], category="c")
+        new = self.api_video("a", "2026-01-05T00:00:00Z", title="new")
+        update.save_json_merged([new], "c", "normal", 2026, 1)
+        self.assertEqual(self.read_json(path), [dict(stored, title="new")])
+
+    def test_returned_fields_are_updated(self):
+        path = self.write_month([make_video("a", "2026-01-05T00:00:00Z")], category="c")
+        fresh = make_video(
+            "a", "2026-01-05T00:00:00Z", duration="2:00", viewCount="99", thumbnail="new"
+        )
+        update.save_json_merged([fresh], "c", "normal", 2026, 1)
+        self.assertEqual(self.read_json(path), [fresh])
+
+    def test_new_video_without_details_gets_empty_values(self):
+        new = self.api_video("a", "2026-01-05T00:00:00Z")
+        update.save_json_merged([new], "c", "normal", 2026, 1)
+        saved = self.read_json(update.get_save_path("c", "normal", 2026, 1))[0]
+        self.assertEqual(
+            (saved["thumbnail"], saved["duration"], saved["viewCount"]), ("", "", "0")
+        )
+
+    def test_member_video_does_not_keep_view_count(self):
+        stored = make_video("a", "2026-01-05T00:00:00Z")
+        path = self.write_month([stored], category="c", sub="member")
+        new = self.api_video("a", "2026-01-05T00:00:00Z")
+        update.save_json_merged([new], "c", "member", 2026, 1)
+        saved = self.read_json(path)[0]
+        self.assertNotIn("viewCount", saved)
+        self.assertEqual(saved["duration"], stored["duration"])
+
+    def test_video_moved_to_member_does_not_keep_view_count(self):
+        self.write_month([make_video("a", "2026-01-05T00:00:00Z")], category="c")
+        new = self.api_video("a", "2026-01-05T00:00:00Z")
+        update.process_videos_for_saving([new], "c", "member")
+        path = update.get_save_path("c", "member", 2026, 1)
+        self.assertNotIn("viewCount", self.read_json(path)[0])
+
+    def test_month_change_keeps_values_from_the_newest_copy(self):
+        stale = make_video("a", "2026-01-20T00:00:00Z", duration="", viewCount="0")
+        good = make_video("a", "2026-02-03T00:00:00Z", duration="3:00", viewCount="531")
+        self.write_month([stale], category="c", month=1)
+        self.write_month([good], category="c", month=2)
+        new = self.api_video("a", "2026-03-10T00:00:00Z")
+
+        update.process_videos_for_saving([new], "c", "normal")
+
+        saved = self.read_json(update.get_save_path("c", "normal", 2026, 3))[0]
+        self.assertEqual((saved["duration"], saved["viewCount"]), ("3:00", "531"))
+
+
+    def test_newest_copy_wins_over_stale_copy_in_another_sub_category(self):
+        stale = make_video("a", "2026-01-03T00:00:00Z", thumbnail="stale")
+        good = make_video("a", "2026-01-05T00:00:00Z", thumbnail="good")
+        self.write_month([stale], category="c", sub="normal")
+        path = self.write_month([good], category="c", sub="member")
+        new = self.api_video("a", "2026-01-05T00:00:00Z")
+
+        update.process_videos_for_saving([new], "c", "member")
+
+        self.assertEqual(self.read_json(path)[0]["thumbnail"], "good")
+
+
 class GenerateAllVideosIndexTest(DataDirTestCase):
     def test_compact_index_omits_derivable_fields(self):
         default_thumb = make_video("a", "2026-01-05T00:00:00Z", tags=["ゲーム"])

@@ -11,6 +11,9 @@ API_KEY = os.environ.get("YOUTUBE_API_KEY")
 # File to store the last update date
 LAST_UPDATE_FILE = "data/last_update.json"
 
+# Fields the API can omit, with the value used when none is stored either
+STORED_FIELD_DEFAULTS = {"thumbnail": "", "duration": "", "viewCount": "0"}
+
 
 PLAYLIST_IDS = {
     "videos": {
@@ -86,13 +89,14 @@ def fetch_video_details(video_ids, include_view_count=True):
     details = {}
     for item in data.get("items", []):
         video_id = item["id"]
-        duration = item["contentDetails"].get("duration")
+        duration = parse_duration(item["contentDetails"].get("duration"))
+        view_count = item.get("statistics", {}).get("viewCount")
 
-        details[video_id] = {"duration": parse_duration(duration)}
-        if include_view_count:
-            details[video_id]["viewCount"] = item["statistics"].get(
-                "viewCount", "0"
-            )
+        details[video_id] = {}
+        if duration:
+            details[video_id]["duration"] = duration
+        if include_view_count and view_count is not None:
+            details[video_id]["viewCount"] = view_count
 
     return details
 
@@ -109,7 +113,7 @@ def build_video(item, details, playlist_id, include_view_count):
     # Parse tags
     tags = parse_description_for_tags(snippet.get("description", ""))
 
-    video_info = details.get(video_id, {"duration": ""})
+    video_info = details.get(video_id, {})
 
     video = {
         "title": snippet["title"],
@@ -117,18 +121,15 @@ def build_video(item, details, playlist_id, include_view_count):
         "description": snippet["description"],
         "channelTitle": snippet["channelTitle"],
         "publishedAt": snippet["publishedAt"],
-        "thumbnail": (
-            snippet["thumbnails"]["high"]["url"]
-            if "high" in snippet["thumbnails"]
-            else ""
-        ),
+        "thumbnail": snippet["thumbnails"].get("high", {}).get("url"),
         "playlistId": playlist_id,
         "tags": tags,  # Add tags field
-        "duration": video_info["duration"],
+        "duration": video_info.get("duration"),
     }
     if include_view_count:
-        video["viewCount"] = video_info.get("viewCount", "0")
-    return video
+        video["viewCount"] = video_info.get("viewCount")
+    # Leave out what the API did not return so merging keeps the stored value
+    return {k: v for k, v in video.items() if v is not None}
 
 
 def fetch_videos_from_playlist(
@@ -288,6 +289,43 @@ def load_existing_videos(category, sub_category, year, month):
     return []
 
 
+def keep_stored_fields(video, stored, sub_category):
+    """Fills the fields the API did not return from the stored video."""
+    merged = dict(video)
+    for field, default in STORED_FIELD_DEFAULTS.items():
+        if field not in merged:
+            merged[field] = stored.get(field, default)
+    if sub_category == "member":
+        merged.pop("viewCount", None)
+    return merged
+
+
+def restore_fields_from_other_months(videos):
+    """
+    Copies stored values into videos missing them. A video whose publish
+    month changed has no stored copy in the month it is about to be saved to.
+    """
+    incomplete = {
+        v["videoId"]: v
+        for v in videos
+        if any(field not in v for field in STORED_FIELD_DEFAULTS)
+    }
+    if not incomplete or not os.path.exists("data"):
+        return
+
+    copies = []
+    for *_, path in iter_month_files():
+        with open(path, "r", encoding="utf-8") as f:
+            copies += [v for v in json.load(f) if v["videoId"] in incomplete]
+
+    # Newest copy first: older copies are stale pre-stream entries
+    for stored in sorted(copies, key=lambda v: v["publishedAt"], reverse=True):
+        video = incomplete[stored["videoId"]]
+        for field in STORED_FIELD_DEFAULTS:
+            if field not in video and stored.get(field):
+                video[field] = stored[field]
+
+
 def save_json_merged(new_videos, category, sub_category, year, month):
     """
     Merges new and existing video data,
@@ -301,7 +339,9 @@ def save_json_merged(new_videos, category, sub_category, year, month):
 
     combined_dict = {v["videoId"]: v for v in existing_videos}
     for video in new_videos:
-        combined_dict[video["videoId"]] = video
+        combined_dict[video["videoId"]] = keep_stored_fields(
+            video, combined_dict.get(video["videoId"], {}), sub_category
+        )
 
     sorted_videos = sorted(
         list(combined_dict.values()),
@@ -355,6 +395,8 @@ def process_videos_for_saving(videos, category, sub_category):
     if not videos:
         print(f"No videos to process for '{category}' -> '{sub_category}'.")
         return
+
+    restore_fields_from_other_months(videos)
 
     videos_by_month = {}
     for video in videos:
