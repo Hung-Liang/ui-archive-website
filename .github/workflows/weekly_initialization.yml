@@ -2,7 +2,8 @@ name: Weekly YouTube Sync
 
 on:
   schedule:
-    - cron: '0 4 * * 0'
+    # Shares a YouTube API quota with chu-archive-website, which syncs on Sunday
+    - cron: '0 4 * * 6'
   workflow_dispatch:
 
 jobs:
