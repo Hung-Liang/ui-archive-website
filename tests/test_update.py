@@ -322,6 +322,66 @@ class CleanUpLocalDataTest(DataDirTestCase):
         )
 
 
+class FetchVideosFromPlaylistTest(DataDirTestCase):
+    def page(self, video_id, next_page_token=None):
+        data = {
+            "items": [
+                {
+                    "snippet": {
+                        "title": f"title {video_id}",
+                        "description": "",
+                        "channelTitle": "channel",
+                        "publishedAt": "2026-01-05T00:00:00Z",
+                        "thumbnails": {},
+                    },
+                    "contentDetails": {"videoId": video_id},
+                }
+            ]
+        }
+        if next_page_token:
+            data["nextPageToken"] = next_page_token
+        return mock.Mock(json=mock.Mock(return_value=data))
+
+    def fetch(self, pages, max_results):
+        with mock.patch.object(
+            update.requests, "get", side_effect=pages
+        ) as get, mock.patch.object(
+            update, "fetch_video_details", return_value={}
+        ):
+            videos = update.fetch_videos_from_playlist(
+                "p", max_results=max_results
+            )
+        params = [call.kwargs["params"] for call in get.call_args_list]
+        return [v["videoId"] for v in videos], params
+
+    def test_limited_fetch_sends_one_request(self):
+        ids, params = self.fetch([self.page("a", "page2")], max_results=30)
+        self.assertEqual(ids, ["a"])
+        self.assertEqual([p["maxResults"] for p in params], [30])
+
+    def test_full_fetch_follows_every_page(self):
+        pages = [self.page("a", "p2"), self.page("b", "p3"), self.page("c")]
+        ids, params = self.fetch(pages, max_results=None)
+        self.assertEqual(ids, ["a", "b", "c"])
+        self.assertEqual([p["pageToken"] for p in params], [None, "p2", "p3"])
+        self.assertEqual({p["maxResults"] for p in params}, {50})
+
+    def test_sync_commands_choose_their_limit(self):
+        video = make_video("a", "2026-01-05T00:00:00Z")
+        for command, limit in [
+            (update.daily_update, 30),
+            (update.initialize_all_playlists, None),
+        ]:
+            with self.subTest(command=command.__name__), mock.patch.object(
+                update, "fetch_videos_from_playlist", return_value=[video]
+            ) as fetch:
+                command()
+                self.assertEqual(
+                    {call.kwargs["max_results"] for call in fetch.call_args_list},
+                    {limit},
+                )
+
+
 class DailyUpdateTest(DataDirTestCase):
     def run_daily_update(self, latest):
         category, sub_category = EXPECTED_LOCATION
@@ -380,7 +440,7 @@ class InitializeGuardTest(DataDirTestCase):
 
         with mock.patch.object(
             update,
-            "fetch_all_videos_from_playlist",
+            "fetch_videos_from_playlist",
             side_effect=lambda pid, **_: [fresh] if pid == playlist_id else [other],
         ):
             update.initialize_all_playlists()
@@ -394,7 +454,7 @@ class InitializeGuardTest(DataDirTestCase):
     def test_empty_playlist_aborts_before_writing(self):
         video = make_video("a", "2026-01-05T00:00:00Z")
         with mock.patch.object(
-            update, "fetch_all_videos_from_playlist", side_effect=[[video], []]
+            update, "fetch_videos_from_playlist", side_effect=[[video], []]
         ):
             with self.assertRaises(RuntimeError):
                 update.initialize_all_playlists()
@@ -410,7 +470,7 @@ class InitializeGuardTest(DataDirTestCase):
 
         with mock.patch.object(
             update,
-            "fetch_all_videos_from_playlist",
+            "fetch_videos_from_playlist",
             side_effect=lambda pid, **_: stored[:1],
         ):
             with self.assertRaisesRegex(RuntimeError, f"{playlist_id}.*1 videos.*20"):
@@ -486,7 +546,7 @@ class SiteTimezoneMonthTest(DataDirTestCase):
         category, sub_category = EXPECTED_LOCATION
         for command, fetch_name in [
             (update.daily_update, "fetch_videos_from_playlist"),
-            (update.initialize_all_playlists, "fetch_all_videos_from_playlist"),
+            (update.initialize_all_playlists, "fetch_videos_from_playlist"),
         ]:
             with self.subTest(command=command.__name__):
                 video = make_video("edge", "2025-01-31T18:15:49Z")

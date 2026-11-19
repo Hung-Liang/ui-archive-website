@@ -139,42 +139,8 @@ def fetch_videos_from_playlist(
     playlist_id, max_results=30, include_view_count=True
 ):
     """
-    Fetches the latest videos from the specified playlist,
-    defaulting to max 30 results.
-    This function is used for daily updates.
-    """
-    videos = []
-    url = "https://www.googleapis.com/youtube/v3/playlistItems"
-
-    params = {
-        "key": API_KEY,
-        "playlistId": playlist_id,
-        "part": "snippet,contentDetails",
-        "maxResults": max_results,
-    }
-
-    response = requests.get(url, params=params, timeout=30)
-    response.raise_for_status()
-
-    data = response.json()
-
-    video_ids = [
-        item["contentDetails"]["videoId"] for item in data.get("items", [])
-    ]
-    details = fetch_video_details(video_ids, include_view_count)
-
-    for item in data.get("items", []):
-        video = build_video(item, details, playlist_id, include_view_count)
-        if video:
-            videos.append(video)
-
-    return videos
-
-
-def fetch_all_videos_from_playlist(playlist_id, include_view_count=True):
-    """
-    Fetches all videos from the specified playlist.
-    This function is for initialization and will paginate through all results.
+    Fetches the latest videos from the specified playlist, defaulting to
+    max 30 results. max_results=None paginates through the whole playlist.
     """
     videos = []
     next_page_token = None
@@ -185,7 +151,7 @@ def fetch_all_videos_from_playlist(playlist_id, include_view_count=True):
             "key": API_KEY,
             "playlistId": playlist_id,
             "part": "snippet,contentDetails",
-            "maxResults": 50,
+            "maxResults": 50 if max_results is None else max_results,
             "pageToken": next_page_token,
         }
 
@@ -204,7 +170,7 @@ def fetch_all_videos_from_playlist(playlist_id, include_view_count=True):
                 videos.append(video)
 
         next_page_token = data.get("nextPageToken")
-        if not next_page_token:
+        if max_results is not None or not next_page_token:
             break
     return videos
 
@@ -633,8 +599,10 @@ def initialize_all_playlists():
                 f"-> '{sub_category}' (Playlist: {playlist_id})..."
             )
 
-            videos = fetch_all_videos_from_playlist(
-                playlist_id, include_view_count=sub_category != "member"
+            videos = fetch_videos_from_playlist(
+                playlist_id,
+                max_results=None,
+                include_view_count=sub_category != "member",
             )
             print(
                 f"Fetched {len(videos)} videos from '{category}' "
