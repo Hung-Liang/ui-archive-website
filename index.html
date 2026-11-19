@@ -251,10 +251,6 @@
               // Set category title based on category key
               if (category === "videos") {
                 categoryTitle.setAttribute("data-i18n", "live_stream_archive");
-              } else {
-                categoryTitle.textContent = `${
-                  category.charAt(0).toUpperCase() + category.slice(1)
-                }`; // Fallback for other categories
               }
               container.appendChild(categoryTitle);
 
@@ -277,10 +273,6 @@
                     "data-i18n",
                     "member_only_category"
                   );
-                } else {
-                  subCategoryTitle.textContent = `${
-                    sub_category.charAt(0).toUpperCase() + sub_category.slice(1)
-                  }`; // Fallback
                 }
                 container.appendChild(subCategoryTitle);
 

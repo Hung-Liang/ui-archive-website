@@ -125,9 +125,3 @@ function setupLanguageSelector() {
 document.addEventListener("DOMContentLoaded", () => {
     setupLanguageSelector();
 });
-
-// Expose functions to the global scope if needed by other scripts
-window.loadTranslations = loadTranslations;
-window.applyTranslations = applyTranslations;
-window.currentLanguage = currentLanguage; // Make currentLanguage accessible
-window.translations = translations; // Make translations accessible
