@@ -653,8 +653,7 @@ def main():
         else:
             print(f"Unknown command: {command}")
             print("Available commands: initialize, daily_update")
-            print("Defaulting to daily_update.")
-            daily_update()
+            sys.exit(1)
     else:
         daily_update()
 

@@ -1,3 +1,5 @@
+import contextlib
+import io
 import json
 import os
 import sys
@@ -397,6 +399,37 @@ class InitializeGuardTest(DataDirTestCase):
             with self.assertRaises(RuntimeError):
                 update.initialize_all_playlists()
         self.assertFalse(os.path.exists("data"))
+
+
+class MainTest(unittest.TestCase):
+    def run_main(self, *args):
+        with mock.patch.object(sys, "argv", ["update.py", *args]), mock.patch.object(
+            update, "daily_update"
+        ) as daily, mock.patch.object(update, "initialize_all_playlists") as initialize:
+            try:
+                update.main()
+            except SystemExit as e:
+                return e.code, daily, initialize
+        return None, daily, initialize
+
+    def test_unknown_command_exits_without_updating(self):
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            code, daily, initialize = self.run_main("daily_updat")
+        self.assertEqual(code, 1)
+        daily.assert_not_called()
+        initialize.assert_not_called()
+        self.assertIn("initialize, daily_update", output.getvalue())
+
+    def test_no_argument_runs_daily_update(self):
+        code, daily, initialize = self.run_main()
+        self.assertIsNone(code)
+        daily.assert_called_once_with()
+        initialize.assert_not_called()
+
+    def test_known_commands_still_run(self):
+        self.assertEqual(self.run_main("daily_update")[1].call_count, 1)
+        self.assertEqual(self.run_main("initialize")[2].call_count, 1)
 
 
 if __name__ == "__main__":
