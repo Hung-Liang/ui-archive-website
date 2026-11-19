@@ -2,7 +2,7 @@ import json
 import os
 import re
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 
@@ -10,6 +10,9 @@ API_KEY = os.environ.get("YOUTUBE_API_KEY")
 
 # File to store the last update date
 LAST_UPDATE_FILE = "data/last_update.json"
+
+# Months are archived in the streamer's local time
+SITE_TIMEZONE = timezone(timedelta(hours=9))
 
 # Fields the API can omit, with the value used when none is stored either
 STORED_FIELD_DEFAULTS = {"thumbnail": "", "duration": "", "viewCount": "0"}
@@ -384,7 +387,7 @@ def get_video_year_month(video):
     """Returns the (year, month) a video is archived under."""
     published_at_dt = datetime.fromisoformat(
         video["publishedAt"].replace("Z", "+00:00")
-    )
+    ).astimezone(SITE_TIMEZONE)
     return published_at_dt.year, published_at_dt.month
 
 

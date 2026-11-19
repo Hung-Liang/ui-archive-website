@@ -401,6 +401,54 @@ class InitializeGuardTest(DataDirTestCase):
         self.assertFalse(os.path.exists("data"))
 
 
+class SiteTimezoneMonthTest(DataDirTestCase):
+    def test_month_uses_site_timezone(self):
+        for published_at, expected in [
+            ("2025-01-31T18:15:49Z", (2025, 2)),
+            ("2025-01-31T14:59:59Z", (2025, 1)),
+            ("2025-01-31T15:00:00Z", (2025, 2)),
+            ("2024-12-31T18:00:00Z", (2025, 1)),
+        ]:
+            with self.subTest(published_at=published_at):
+                video = make_video("a", published_at)
+                self.assertEqual(update.get_video_year_month(video), expected)
+
+    def sync(self, command, fetch_name, video):
+        category, sub_category = EXPECTED_LOCATION
+        playlist_id = update.PLAYLIST_IDS[category][sub_category]
+        other = make_video("other", "2026-06-15T00:00:00Z")
+        with mock.patch.object(
+            update,
+            fetch_name,
+            side_effect=lambda pid, **_: [video] if pid == playlist_id else [other],
+        ):
+            command()
+
+    def test_month_boundary_video_survives_save_and_clean_up(self):
+        category, sub_category = EXPECTED_LOCATION
+        for command, fetch_name in [
+            (update.daily_update, "fetch_videos_from_playlist"),
+            (update.initialize_all_playlists, "fetch_all_videos_from_playlist"),
+        ]:
+            with self.subTest(command=command.__name__):
+                video = make_video("edge", "2025-01-31T18:15:49Z")
+                # Copy left in the month the old UTC calculation chose
+                utc_month = self.write_month(
+                    [video], category=category, year=2025, month=1
+                )
+
+                self.sync(command, fetch_name, video)
+
+                self.assertFalse(os.path.exists(utc_month))
+                saved = update.get_save_path(category, sub_category, 2025, 2)
+                self.assertEqual(self.read_json(saved), [video])
+                index = self.read_json("data/all_videos_index.json")
+                self.assertEqual(
+                    [(v["year"], v["month"]) for v in index if v["videoId"] == "edge"],
+                    [(2025, 2)],
+                )
+
+
 class MainTest(unittest.TestCase):
     def run_main(self, *args):
         with mock.patch.object(sys, "argv", ["update.py", *args]), mock.patch.object(
