@@ -10,6 +10,12 @@ const languageMap = {
     jp: "日本語",
 };
 
+// Site language codes that differ from their BCP 47 tag
+const htmlLangCodes = {
+    jp: "ja",
+    "zh-TW": "zh-Hant",
+};
+
 async function loadTranslations() {
     // A newer language switch can change currentLanguage while this fetch is pending
     const requestedLanguage = currentLanguage;
@@ -57,6 +63,8 @@ function fillVariables(element, text) {
 }
 
 function applyTranslations() {
+    document.documentElement.lang = htmlLangCodes[currentLanguage] || currentLanguage;
+
     document.querySelectorAll("[data-i18n]").forEach((element) => {
         const key = element.getAttribute("data-i18n");
         if (translations[currentLanguage] && translations[currentLanguage][key]) {
