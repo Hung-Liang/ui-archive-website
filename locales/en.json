@@ -25,6 +25,7 @@
     "sort_newest": "Newest first",
     "sort_oldest": "Oldest first",
     "no_matching_streams": "No matching streams found.",
+    "unable_to_load_search_data": "Unable to load search data, please try again later.",
     "found_results_prefix": "Found",
     "found_results_suffix": "results.",
     "enter_keywords_to_search": "Please enter keywords to search...",

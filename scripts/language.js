@@ -11,13 +11,15 @@ const languageMap = {
 };
 
 async function loadTranslations() {
+    // A newer language switch can change currentLanguage while this fetch is pending
+    const requestedLanguage = currentLanguage;
     try {
         // Correct the path to access the locales folder from the parent directory
-        const response = await fetch(new URL(`${currentLanguage}.json`, localesBaseUrl));
+        const response = await fetch(new URL(`${requestedLanguage}.json`, localesBaseUrl));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        translations[currentLanguage] = await response.json();
+        translations[requestedLanguage] = await response.json();
 
         // Load other languages if needed, or just the current one
         // Ensure paths are correct for all fetches
@@ -106,6 +108,7 @@ function setupLanguageSelector() {
             localStorage.setItem("language", currentLanguage);
             await loadTranslations();
             applyTranslations();
+            document.dispatchEvent(new CustomEvent("languageChanged"));
         });
     }
 }

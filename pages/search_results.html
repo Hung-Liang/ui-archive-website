@@ -197,6 +197,7 @@
         const lastUpdateDateSpan = document.getElementById("last-update-date");
 
         let allVideosIndexData = [];
+        let searchDataReady = false;
 
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearchTerm = urlParams.get("query") || "";
@@ -378,7 +379,31 @@
           applyTranslations(); // Apply translations after updating text
         }
 
+        // False while data or the selected language is still loading, and after a
+        // failed load so the error message stays on screen
+        function canRenderSearch() {
+          return searchDataReady && Boolean(translations[currentLanguage]);
+        }
+
+        function refreshSearchView() {
+          if (!canRenderSearch()) {
+            return;
+          }
+          // Perform search based on initial query or tag
+          // The performSearch function now handles both single and multiple tags
+          if (searchInput.value.trim()) {
+            performSearch();
+          } else {
+            // Otherwise, prompt user to search
+            searchResultsInfo.textContent =
+              translations[currentLanguage]["enter_keywords_to_search"];
+          }
+        }
+
         function performSearch() {
+          if (!canRenderSearch()) {
+            return;
+          }
           const query = searchInput.value.toLowerCase().trim();
           if (query === "") {
             renderSearchResults([]);
@@ -491,25 +516,20 @@
           })
           .then((data) => {
             allVideosIndexData = data;
-            // Perform search based on initial query or tag
-            // The performSearch function now handles both single and multiple tags
-            if (initialTagSearch || initialSearchTerm) {
-              performSearch();
-            } else {
-              // Otherwise, prompt user to search
-              searchResultsInfo.textContent =
-                translations[currentLanguage]["enter_keywords_to_search"];
-            }
+            searchDataReady = true;
+            refreshSearchView();
             applyTranslations(); // Apply translations after updating text
           })
           .catch((error) => {
             console.error("Error fetching all_videos_index.json:", error);
+            searchDataReady = false;
             videoListContainer.innerHTML = `<p class='list-message error'><span data-i18n="unable_to_load_search_data">Unable to load search data, please try again later.</span><br>Error: ${escapeHtml(error.message)}</p>`;
             applyTranslations(); // Apply translations after updating text
           });
 
         searchInput.addEventListener("input", performSearch);
         sortSelect.addEventListener("change", performSearch);
+        document.addEventListener("languageChanged", refreshSearchView);
       });
     </script>
   </body>

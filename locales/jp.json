@@ -26,6 +26,7 @@
     "sort_newest": "新しい順",
     "sort_oldest": "古い順",
     "no_matching_streams": "該当する配信は見つかりませんでした。",
+    "unable_to_load_search_data": "検索データを読み込めませんでした。後でもう一度お試しください。",
     "found_results_prefix": "",
     "found_results_suffix": "件の結果が見つかりました。",
     "enter_keywords_to_search": "キーワードを入力してください...",
