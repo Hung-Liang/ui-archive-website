@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ui-archive-v5';
+const CACHE_NAME = 'ui-archive-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -44,9 +44,10 @@ function putInCache(request, response) {
   return response;
 }
 
-// Pages and data must stay fresh; fall back to cache only when offline
+// Pages, scripts and data must stay fresh; fall back to cache only when offline
 function networkFirst(request) {
-  return fetch(request)
+  // no-cache revalidates with the server so the browser HTTP cache cannot serve a stale script
+  return fetch(request, { cache: 'no-cache' })
     .then((response) => putInCache(request, response))
     .catch((error) => {
       // month.html is the same page for every ?cat=&y=&m= combination
@@ -59,20 +60,6 @@ function networkFirst(request) {
     });
 }
 
-// Serve static assets from cache immediately, refresh them in the background
-function staleWhileRevalidate(event, request) {
-  return caches.match(request).then((cachedResponse) => {
-    const networkFetch = fetch(request).then((response) => putInCache(request, response));
-    if (cachedResponse) {
-      event.waitUntil(
-        networkFetch.catch((error) => console.warn('Background refresh failed:', request.url, error))
-      );
-      return cachedResponse;
-    }
-    return networkFetch;
-  });
-}
-
 // Fetch events
 self.addEventListener('fetch', (event) => {
   const request = event.request;
@@ -83,9 +70,5 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (request.mode === 'navigate' || url.pathname.includes('/data/')) {
-    event.respondWith(networkFirst(request));
-  } else {
-    event.respondWith(staleWhileRevalidate(event, request));
-  }
+  event.respondWith(networkFirst(request));
 });
