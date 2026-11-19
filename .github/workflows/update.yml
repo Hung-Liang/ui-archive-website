@@ -23,6 +23,9 @@ jobs:
       - name: Run tests
         run: python -m unittest discover -s tests
 
+      - name: Run search tests
+        run: node --test tests/search.test.js
+
       - name: Run update script
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}

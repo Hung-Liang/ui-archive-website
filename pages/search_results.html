@@ -194,7 +194,6 @@
         const searchResultsInfo = document.getElementById(
           "search-results-info"
         );
-        const lastUpdateDateSpan = document.getElementById("last-update-date");
 
         let allVideosIndexData = [];
         let searchDataReady = false;
@@ -211,28 +210,7 @@
         }
 
         // Load last update date
-        fetch("../data/last_update.json")
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.json();
-          })
-          .then((data) => {
-            if (data && data.last_update) {
-              lastUpdateDateSpan.textContent = formatLastUpdate(data.last_update);
-            } else {
-              lastUpdateDateSpan.textContent = "Unable to load";
-              lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
-            }
-            applyTranslations();
-          })
-          .catch((error) => {
-            console.error("Error fetching last_update.json:", error);
-            lastUpdateDateSpan.textContent = "Unable to load";
-            lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
-            applyTranslations();
-          });
+        loadLastUpdate("../data/last_update.json");
 
         function getCategoryDisplayName(category) {
           if (category === "videos") {
@@ -257,53 +235,6 @@
             );
           }
           return "";
-        }
-
-        // Function to render a single video item
-        function renderVideoItem(video) {
-          const div = document.createElement("div");
-          div.className = "video-item";
-          const youtubeUrl = `https://www.youtube.com/watch?v=${video.videoId}`;
-
-          let tagsHtml = "";
-          if (video.tags && video.tags.length > 0) {
-            tagsHtml =
-              `<div class="video-tags">` +
-              video.tags
-                .map(
-                  (tag) =>
-                    `<span data-tag="${escapeHtml(
-                      String(tag).toLowerCase()
-                    )}">${escapeHtml(tag)}</span>`
-                )
-                .join("") +
-              `</div>`;
-          }
-
-          const durationHtml = video.duration ? `<span class="video-duration">${video.duration}</span>` : "";
-          const viewCountText = (translations[currentLanguage] && translations[currentLanguage]["view_count"]) || "views";
-          const viewCountHtml = video.viewCount && video.subCategory !== "member" ?`<p class="video-view-count">${Number(video.viewCount).toLocaleString()} ${viewCountText}</p>` : "";
-
-          div.innerHTML = `
-            <a href="${youtubeUrl}" target="_blank">
-              <div class="video-thumbnail-container">
-                <img src="${video.thumbnail || `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`}" alt="${escapeHtml(video.title)}" width="320" loading="lazy" onerror="this.onerror=null;this.src='../asset/thumbnail_placeholder.svg'">
-                ${durationHtml}
-              </div>
-              <p class="video-title">${escapeHtml(video.title)}</p>
-              ${viewCountHtml}
-              <p class="video-meta">
-                (${video.year}${
-            translations[currentLanguage]["year_suffix"] || ""
-          }${video.month}${translations[currentLanguage]["month_suffix"] || ""})
-              </p>
-              <p class="video-date">${new Date(
-                video.publishedAt
-              ).toLocaleDateString()}</p>
-            </a>
-            ${tagsHtml}
-          `;
-          return div;
         }
 
         function renderSearchResults(results) {
@@ -363,7 +294,12 @@
 
                   groupedVideos[categoryKey][subCategoryKey].forEach(
                     (video) => {
-                      videoGrid.appendChild(renderVideoItem(video));
+                      videoGrid.appendChild(
+                        renderVideoItem(video, {
+                          subCategory: video.subCategory,
+                          showMonth: true,
+                        }),
+                      );
                       totalDisplayedVideos++;
                     }
                   );
@@ -413,30 +349,11 @@
             return;
           }
 
+          const filteredResults = filterVideos(allVideosIndexData, query);
+
           // If the query starts with '#', treat it as a tag search
           if (query.startsWith("#")) {
-            const tagString = query.substring(1).trim(); // Remove '#' and trim
-            // Some stored tags keep surrounding spaces, so compare them trimmed
-            const isExactTag =
-              tagString !== "" &&
-              allVideosIndexData.some(
-                (video) =>
-                  Array.isArray(video.tags) &&
-                  video.tags.some(
-                    (tag) => String(tag).toLowerCase().trim() === tagString
-                  )
-              );
-            // Split by one or more spaces, and then for each part, remove any leading '#' and convert to lowercase
-            const searchTags = isExactTag
-              ? [tagString]
-              : tagString
-                  .split(/\s+/)
-                  .filter((t) => t !== "")
-                  .map((t) => {
-                    return t.startsWith("#")
-                      ? t.substring(1).toLowerCase()
-                      : t.toLowerCase();
-                  });
+            const { searchTags } = parseTagQuery(allVideosIndexData, query);
 
             if (searchTags.length === 0) {
               renderSearchResults([]);
@@ -446,63 +363,17 @@
               return;
             }
 
-            const filteredResults = allVideosIndexData.filter((video) => {
-              // Ensure video.tags exists and is an array
-              if (!video.tags || !Array.isArray(video.tags)) {
-                return false;
-              }
-              // Convert video's tags to lowercase for case-insensitive comparison
-              const lowerCaseVideoTags = video.tags.map((tag) => {
-                const lowerCaseTag = String(tag).toLowerCase();
-                return isExactTag ? lowerCaseTag.trim() : lowerCaseTag;
-              });
-              // Check if all searchTags (which are already lowercase) are included in lowerCaseVideoTags
-              return searchTags.every((searchTag) =>
-                lowerCaseVideoTags.includes(searchTag)
-              );
-            });
-
             renderSearchResults(filteredResults);
             const tagsDisplay = searchTags.map((tag) => `"${tag}"`).join(", ");
             searchResultsInfo.textContent = `${translations[currentLanguage]["found_results_prefix"]} ${filteredResults.length} ${translations[currentLanguage]["results_containing_tags"]} ${tagsDisplay}`;
             applyTranslations(); // Apply translations after updating text
           } else {
             // Otherwise, perform a title search
-            const filteredResults = allVideosIndexData.filter((video) => {
-              const titleMatches = video.title.toLowerCase().includes(query);
-
-              // Check if any of the video's tags contain the query
-              const tagsMatch =
-                video.tags && Array.isArray(video.tags)
-                  ? video.tags.some((tag) =>
-                      String(tag).toLowerCase().includes(query)
-                    )
-                  : false;
-
-              return titleMatches || tagsMatch; // Return true if title OR tags match
-            });
             renderSearchResults(filteredResults);
             searchResultsInfo.textContent = `${translations[currentLanguage]["found_results_prefix"]} ${filteredResults.length} ${translations[currentLanguage]["found_results_suffix"]}`;
             applyTranslations(); // Apply translations after updating text
           }
         }
-
-        // Event delegation for tag clicks on videoListContainer
-        videoListContainer.addEventListener("click", (event) => {
-          const target = event.target;
-          // Check if the clicked element is a tag span
-          if (target.matches(".video-tags span")) {
-            event.preventDefault(); // Prevent default link behavior
-            event.stopPropagation(); // Stop event bubbling
-            const tag = target.dataset.tag; // This tag is already lowercase from renderVideoItem
-            // Redirect to search_results.html with the tag as a query parameter
-            // For multiple tags, we'll just pass the single clicked tag.
-            // User can then manually add more tags in the search bar if needed.
-            window.location.href = `./search_results.html?tag=${encodeURIComponent(
-              tag
-            )}`;
-          }
-        });
 
         // Fetch all videos index data
         fetch("../data/all_videos_index.json")

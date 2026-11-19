@@ -154,31 +154,8 @@
         applyTranslations();
         loadMonthVideos();
 
-        const lastUpdateDateSpan = document.getElementById("last-update-date");
-
         // 載入最後更新日期
-        fetch("../data/last_update.json")
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.json();
-          })
-          .then((data) => {
-            if (data && data.last_update) {
-              lastUpdateDateSpan.textContent = formatLastUpdate(data.last_update);
-            } else {
-              lastUpdateDateSpan.textContent = "Unable to load";
-              lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
-            }
-            applyTranslations();
-          })
-          .catch((error) => {
-            console.error("Error fetching last_update.json:", error);
-            lastUpdateDateSpan.textContent = "Unable to load";
-            lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
-            applyTranslations();
-          });
+        loadLastUpdate("../data/last_update.json");
       });
     </script>
   </body>

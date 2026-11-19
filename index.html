@@ -230,7 +230,6 @@
         const performSearchButton = document.getElementById(
           "perform-search-button"
         );
-        const lastUpdateDateSpan = document.getElementById("last-update-date");
 
         fetch("data/index.json")
           .then((res) => res.json())
@@ -343,28 +342,7 @@
             applyTranslations();
           });
 
-        fetch("data/last_update.json")
-          .then((res) => {
-            if (!res.ok) {
-              throw new Error(`HTTP error! status: ${res.status}`);
-            }
-            return res.json();
-          })
-          .then((data) => {
-            if (data && data.last_update) {
-              lastUpdateDateSpan.textContent = formatLastUpdate(data.last_update);
-            } else {
-              lastUpdateDateSpan.textContent = "Unable to load";
-              lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
-            }
-            applyTranslations();
-          })
-          .catch((error) => {
-            console.error("Error fetching last_update.json:", error);
-            lastUpdateDateSpan.textContent = "Unable to load";
-            lastUpdateDateSpan.setAttribute("data-i18n", "unable_to_load");
-            applyTranslations();
-          });
+        loadLastUpdate("data/last_update.json");
 
         openSearchButton.addEventListener("click", () => {
           searchPopupOverlay.style.display = "flex";
