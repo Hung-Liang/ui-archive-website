@@ -38,6 +38,9 @@ def parse_description_for_tags(description):
 
     all_tags = re.findall(r"#(\w+)", description)
     for tag in all_tags:
+        # Chapter markers such as "#1" are not tags
+        if tag.isdigit():
+            continue
         if tag not in tags:
             tags.append(tag)
 
