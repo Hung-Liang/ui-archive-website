@@ -55,10 +55,13 @@ class ParseDescriptionForTagsTest(unittest.TestCase):
             ["ゲーム", "雑談"],
         )
 
-    def test_keeps_duplicate_hashtags(self):
+    def test_deduplicates_tags(self):
+        self.assertEqual(update.parse_description_for_tags("#a #a"), ["a"])
+
+    def test_ignores_url_fragments(self):
         self.assertEqual(
-            update.parse_description_for_tags("#しぐれうい #しぐれうい"),
-            ["しぐれうい", "しぐれうい"],
+            update.parse_description_for_tags("https://a.com/p#x #real"),
+            ["real"],
         )
 
     def test_no_tags(self):

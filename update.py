@@ -25,11 +25,15 @@ def parse_description_for_tags(description):
     Parses video description to extract tags.
     Currently empty, awaiting your algorithm.
     """
+    # A "#fragment" inside a URL is not a hashtag
+    description = re.sub(r"(?:https?://|www\.)\S+", " ", description, flags=re.I)
+
     tags = []
 
     all_tags = re.findall(r"#(\w+)", description)
     for tag in all_tags:
-        tags.append(tag)
+        if tag not in tags:
+            tags.append(tag)
 
     return tags
 
