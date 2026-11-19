@@ -174,20 +174,119 @@ class CleanUpLocalDataTest(DataDirTestCase):
         keep = make_video("keep", "2026-01-05T00:00:00Z")
         gone = make_video("gone", "2026-01-06T00:00:00Z")
         path = self.write_month([gone, keep], category="videos")
-        update.clean_up_local_data({"keep": EXPECTED_LOCATION})
+        update.clean_up_local_data({"keep": EXPECTED_LOCATION + (2026, 1)})
         self.assertEqual(self.read_json(path), [keep])
 
     def test_removes_videos_moved_to_another_location(self):
         moved = make_video("moved", "2026-01-05T00:00:00Z")
         category, sub_category = EXPECTED_LOCATION
-        for location in [("other", sub_category), (category, "member")]:
+        for location in [
+            ("other", sub_category, 2026, 1),
+            (category, "member", 2026, 1),
+            (category, sub_category, 2026, 2),
+            (category, sub_category, 2025, 1),
+        ]:
             with self.subTest(location=location):
                 path = self.write_month([moved], category=category)
                 update.clean_up_local_data({"moved": location})
-                self.assertEqual(self.read_json(path), [])
+                self.assertFalse(os.path.exists(path))
+
+    def test_keeps_missing_videos_when_remove_missing_is_false(self):
+        category, sub_category = EXPECTED_LOCATION
+        old = make_video("old", "2026-01-05T00:00:00Z")
+        stale = make_video("stale", "2026-01-06T00:00:00Z", duration="")
+        path = self.write_month([stale, old], category=category)
+        update.clean_up_local_data(
+            {"stale": (category, sub_category, 2026, 2)}, remove_missing=False
+        )
+        self.assertEqual(self.read_json(path), [old])
+
+    def test_emptied_month_is_deleted_and_leaves_the_index(self):
+        category, sub_category = EXPECTED_LOCATION
+        keep = make_video("keep", "2026-02-05T00:00:00Z")
+        gone = make_video("gone", "2026-01-05T00:00:00Z")
+        emptied = self.write_month([gone], category=category, month=1)
+        self.write_month([keep], category=category, month=2)
+
+        update.clean_up_local_data({"keep": EXPECTED_LOCATION + (2026, 2)})
+        update.update_index_json()
+
+        self.assertFalse(os.path.exists(emptied))
+        self.assertEqual(
+            self.read_json("data/index.json"),
+            {category: {sub_category: {"2026": [2]}}},
+        )
+
+
+class DailyUpdateTest(DataDirTestCase):
+    def run_daily_update(self, latest):
+        category, sub_category = EXPECTED_LOCATION
+        playlist_id = update.PLAYLIST_IDS[category][sub_category]
+        with mock.patch.object(
+            update,
+            "fetch_videos_from_playlist",
+            side_effect=lambda pid, **_: latest if pid == playlist_id else [],
+        ):
+            update.daily_update()
+
+    def test_publish_month_change_leaves_one_copy(self):
+        category, sub_category = EXPECTED_LOCATION
+        stale = make_video("live", "2026-01-20T00:00:00Z", duration="")
+        old = make_video("old", "2026-01-05T00:00:00Z")
+        january = self.write_month([stale, old], category=category, month=1)
+        fresh = make_video("live", "2026-02-03T00:00:00Z")
+
+        self.run_daily_update([fresh])
+
+        self.assertEqual(self.read_json(january), [old])
+        index = self.read_json("data/all_videos_index.json")
+        self.assertEqual(
+            sorted((v["videoId"], v["month"]) for v in index),
+            [("live", 2), ("old", 1)],
+        )
+
+    def test_keeps_videos_outside_the_latest_batch(self):
+        category, _ = EXPECTED_LOCATION
+        old = make_video("old", "2020-01-05T00:00:00Z")
+        path = self.write_month([old], category=category, year=2020)
+
+        self.run_daily_update([make_video("new", "2026-02-03T00:00:00Z")])
+
+        self.assertEqual(self.read_json(path), [old])
+
+    def test_empty_fetch_removes_nothing(self):
+        category, _ = EXPECTED_LOCATION
+        old = make_video("old", "2026-01-05T00:00:00Z")
+        path = self.write_month([old], category=category)
+
+        self.run_daily_update([])
+
+        self.assertEqual(self.read_json(path), [old])
 
 
 class InitializeGuardTest(DataDirTestCase):
+    def test_full_sync_removes_missing_and_stale_copies(self):
+        category, sub_category = EXPECTED_LOCATION
+        stale = make_video("live", "2026-01-20T00:00:00Z", duration="")
+        gone = make_video("gone", "2026-01-05T00:00:00Z")
+        january = self.write_month([stale, gone], category=category, month=1)
+        fresh = make_video("live", "2026-02-03T00:00:00Z")
+        playlist_id = update.PLAYLIST_IDS[category][sub_category]
+        other = make_video("other", "2026-02-04T00:00:00Z")
+
+        with mock.patch.object(
+            update,
+            "fetch_all_videos_from_playlist",
+            side_effect=lambda pid, **_: [fresh] if pid == playlist_id else [other],
+        ):
+            update.initialize_all_playlists()
+
+        self.assertFalse(os.path.exists(january))
+        index = self.read_json("data/all_videos_index.json")
+        self.assertEqual(
+            sorted(v["videoId"] for v in index), ["live", "other"]
+        )
+
     def test_empty_playlist_aborts_before_writing(self):
         video = make_video("a", "2026-01-05T00:00:00Z")
         with mock.patch.object(

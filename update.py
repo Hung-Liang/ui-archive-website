@@ -340,6 +340,14 @@ def update_index_json():
     atomic_save_json(index, os.path.join(base_data_path, "index.json"))
 
 
+def get_video_year_month(video):
+    """Returns the (year, month) a video is archived under."""
+    published_at_dt = datetime.fromisoformat(
+        video["publishedAt"].replace("Z", "+00:00")
+    )
+    return published_at_dt.year, published_at_dt.month
+
+
 def process_videos_for_saving(videos, category, sub_category):
     """
     A generic function to group videos by month and save them.
@@ -350,10 +358,7 @@ def process_videos_for_saving(videos, category, sub_category):
 
     videos_by_month = {}
     for video in videos:
-        published_at_dt = datetime.fromisoformat(
-            video["publishedAt"].replace("Z", "+00:00")
-        )
-        year_month_key = (published_at_dt.year, published_at_dt.month)
+        year_month_key = get_video_year_month(video)
 
         if year_month_key not in videos_by_month:
             videos_by_month[year_month_key] = []
@@ -444,6 +449,7 @@ def update_last_update_date():
 def daily_update():
     """Executes the daily update, fetching only the latest 30 videos."""
     print("--- Executing Daily Update (Fetching Latest 30 Videos) ---")
+    fetched_video_metadata = {}
     for category, sub_categories in PLAYLIST_IDS.items():
         for sub_category, playlist_id in sub_categories.items():
             print(
@@ -463,6 +469,14 @@ def daily_update():
 
             process_videos_for_saving(videos, category, sub_category)
 
+            for v in videos:
+                fetched_video_metadata[v["videoId"]] = (
+                    category, sub_category, *get_video_year_month(v)
+                )
+
+    # Only the latest videos were fetched, so absence here does not mean
+    # a video was deleted.
+    clean_up_local_data(fetched_video_metadata, remove_missing=False)
     update_index_json()
     generate_all_videos_index()
     update_last_update_date()
@@ -470,10 +484,12 @@ def daily_update():
     print("Daily update complete.")
 
 
-def clean_up_local_data(all_fetched_video_metadata):
+def clean_up_local_data(all_fetched_video_metadata, remove_missing=True):
     """
-    Scans all local JSON files in data/ and removes videos that are no longer
-    present in the fetched metadata or have moved to a different category.
+    Scans all local JSON files in data/ and removes copies of videos stored
+    outside the category, sub-category, year and month in the fetched
+    metadata. Videos absent from the metadata are removed too, unless
+    remove_missing is False. Months left without videos are deleted.
     """
     print("--- Starting Local Data Clean-up ---")
     base_data_path = "data"
@@ -484,29 +500,34 @@ def clean_up_local_data(all_fetched_video_metadata):
     for (
         category_folder,
         sub_category_folder,
-        _,
-        _,
+        year,
+        month,
         path,
     ) in iter_month_files():
+        location = (category_folder, sub_category_folder, year, month)
         with open(path, "r", encoding="utf-8") as f:
             videos = json.load(f)
 
         original_count = len(videos)
-        # Filter videos: must be in metadata AND in the correct category/sub_category
+        # Filter videos: must be in metadata AND in the correct category/sub_category/year/month
         pruned_videos = []
         for v in videos:
             video_id = v["videoId"]
             if video_id in all_fetched_video_metadata:
-                expected_cat, expected_sub_cat = all_fetched_video_metadata[video_id]
-                if expected_cat == category_folder and expected_sub_cat == sub_category_folder:
+                expected_location = all_fetched_video_metadata[video_id]
+                if expected_location == location:
                     pruned_videos.append(v)
                 else:
-                    print(f"Video {video_id} moved: {category_folder}/{sub_category_folder} -> {expected_cat}/{expected_sub_cat}")
-            else:
+                    print(f"Video {video_id} moved: {location} -> {expected_location}")
+            elif remove_missing:
                 print(f"Video {video_id} not found in playlists, removing from {path}")
+            else:
+                pruned_videos.append(v)
 
-        if len(pruned_videos) != original_count:
-            removed_count += (original_count - len(pruned_videos))
+        removed_count += (original_count - len(pruned_videos))
+        if not pruned_videos:
+            os.remove(path)
+        elif len(pruned_videos) != original_count:
             atomic_save_json(pruned_videos, path)
 
     print(f"Clean-up complete. Removed {removed_count} orphaned or misplaced video entries.")
@@ -552,7 +573,9 @@ def initialize_all_playlists():
 
             # Populate metadata for clean-up
             for v in videos:
-                all_fetched_video_metadata[v["videoId"]] = (category, sub_category)
+                all_fetched_video_metadata[v["videoId"]] = (
+                    category, sub_category, *get_video_year_month(v)
+                )
 
             fetched_playlists.append((videos, category, sub_category))
 
