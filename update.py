@@ -28,8 +28,7 @@ PLAYLIST_IDS = {
 
 def parse_description_for_tags(description):
     """
-    Parses video description to extract tags.
-    Currently empty, awaiting your algorithm.
+    Extracts hashtags from the description as tags, skipping chapter numbers.
     """
     # A "#fragment" inside a URL is not a hashtag
     description = re.sub(r"(?:https?://|www\.)\S+", " ", description, flags=re.I)
@@ -272,15 +271,20 @@ def keep_stored_fields(video, stored, sub_category):
     return merged
 
 
-def restore_fields_from_other_months(videos):
+def restore_fields_from_other_months(videos, sub_category):
     """
     Copies stored values into videos missing them. A video whose publish
     month changed has no stored copy in the month it is about to be saved to.
     """
+    # Member videos never store a view count, so it is not a missing field
+    fields = [
+        f for f in STORED_FIELD_DEFAULTS
+        if not (sub_category == "member" and f == "viewCount")
+    ]
     incomplete = {
         v["videoId"]: v
         for v in videos
-        if any(field not in v for field in STORED_FIELD_DEFAULTS)
+        if any(field not in v for field in fields)
     }
     if not incomplete or not os.path.exists("data"):
         return
@@ -293,7 +297,7 @@ def restore_fields_from_other_months(videos):
     # Newest copy first: older copies are stale pre-stream entries
     for stored in sorted(copies, key=lambda v: v["publishedAt"], reverse=True):
         video = incomplete[stored["videoId"]]
-        for field in STORED_FIELD_DEFAULTS:
+        for field in fields:
             if field not in video and stored.get(field):
                 video[field] = stored[field]
 
@@ -368,7 +372,7 @@ def process_videos_for_saving(videos, category, sub_category):
         print(f"No videos to process for '{category}' -> '{sub_category}'.")
         return
 
-    restore_fields_from_other_months(videos)
+    restore_fields_from_other_months(videos, sub_category)
 
     videos_by_month = {}
     for video in videos:
@@ -646,8 +650,8 @@ def main():
     or initialization
     via command-line arguments.
     Examples:
-    python your_script_name.py daily_update
-    python your_script_name.py initialize
+    python update.py daily_update
+    python update.py initialize
     If no argument is provided, 'daily_update' will be executed by default.
     """
     import sys

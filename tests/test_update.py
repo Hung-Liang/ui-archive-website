@@ -229,6 +229,13 @@ class KeepStoredFieldsTest(DataDirTestCase):
         path = update.get_save_path("c", "member", 2026, 1)
         self.assertNotIn("viewCount", self.read_json(path)[0])
 
+    def test_complete_member_video_skips_month_scan(self):
+        self.write_month([make_video("a", "2026-01-05T00:00:00Z")], category="c")
+        new = self.api_video("a", "2026-01-05T00:00:00Z", duration="1:00", thumbnail="t")
+        with mock.patch.object(update, "iter_month_files") as iter_month_files:
+            update.restore_fields_from_other_months([new], "member")
+        iter_month_files.assert_not_called()
+
     def test_month_change_keeps_values_from_the_newest_copy(self):
         stale = make_video("a", "2026-01-20T00:00:00Z", duration="", viewCount="0")
         good = make_video("a", "2026-02-03T00:00:00Z", duration="3:00", viewCount="531")
