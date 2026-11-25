@@ -391,7 +391,12 @@
             applyTranslations(); // Apply translations after updating text
           });
 
-        searchInput.addEventListener("input", performSearch);
+        // Debounce typing so each keystroke doesn't rebuild every result card.
+        let searchDebounceTimer;
+        searchInput.addEventListener("input", () => {
+          clearTimeout(searchDebounceTimer);
+          searchDebounceTimer = setTimeout(performSearch, 150);
+        });
         sortSelect.addEventListener("change", performSearch);
         document.addEventListener("languageChanged", refreshSearchView);
       });
