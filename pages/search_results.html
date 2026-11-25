@@ -212,29 +212,22 @@
         // Load last update date
         loadLastUpdate("../data/last_update.json");
 
+        // English fallbacks for when a translation key is missing
+        const CATEGORY_FALLBACKS = { videos: "Live Stream Archive" };
+        const SUB_CATEGORY_FALLBACKS = { normal: "Stream", member: "Member Only" };
+
         function getCategoryDisplayName(category) {
-          if (category === "videos") {
-            // Use translations object directly for dynamic content
-            return (
-              translations[currentLanguage]["live_stream_archive"] ||
-              "Live Stream Archive"
-            );
-          }
-          return "";
+          const key = CATEGORY_KEYS[category];
+          if (!key) return "";
+          // Use translations object directly for dynamic content
+          return translations[currentLanguage][key] || CATEGORY_FALLBACKS[category];
         }
 
         function getSubCategoryDisplayName(subCategory) {
-          if (subCategory === "normal") {
-            // Use translations object directly for dynamic content
-            return translations[currentLanguage]["stream_category"] || "Stream";
-          } else if (subCategory === "member") {
-            // Use translations object directly for dynamic content
-            return (
-              translations[currentLanguage]["member_only_category"] ||
-              "Member Only"
-            );
-          }
-          return "";
+          const key = SUB_CATEGORY_KEYS[subCategory];
+          if (!key) return "";
+          // Use translations object directly for dynamic content
+          return translations[currentLanguage][key] || SUB_CATEGORY_FALLBACKS[subCategory];
         }
 
         function renderSearchResults(results) {

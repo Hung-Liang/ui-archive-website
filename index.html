@@ -249,9 +249,7 @@
 
               const categoryTitle = document.createElement("h2");
               // Set category title based on category key
-              if (category === "videos") {
-                categoryTitle.setAttribute("data-i18n", "live_stream_archive");
-              }
+              categoryTitle.setAttribute("data-i18n", CATEGORY_KEYS[category]);
               container.appendChild(categoryTitle);
 
               // Define the desired order of sub-categories (Normal first, then Member)
@@ -266,14 +264,10 @@
 
                 const subCategoryTitle = document.createElement("h3");
                 // Set sub-category title based on sub_category key
-                if (sub_category === "normal") {
-                  subCategoryTitle.setAttribute("data-i18n", "stream_category");
-                } else if (sub_category === "member") {
-                  subCategoryTitle.setAttribute(
-                    "data-i18n",
-                    "member_only_category"
-                  );
-                }
+                subCategoryTitle.setAttribute(
+                  "data-i18n",
+                  SUB_CATEGORY_KEYS[sub_category]
+                );
                 container.appendChild(subCategoryTitle);
 
                 const yearsData = index[category][sub_category];

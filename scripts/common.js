@@ -1,3 +1,7 @@
+// i18n keys for category titles, shared by the home, month and search pages
+const CATEGORY_KEYS = { videos: "live_stream_archive" };
+const SUB_CATEGORY_KEYS = { normal: "stream_category", member: "member_only_category" };
+
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, "&amp;")

@@ -6,8 +6,6 @@ const month = String(params.get("m")).padStart(2, "0");
 
 // Removed tag popup related elements and logic as it's now handled by redirection to search_results.html
 
-const SUB_CATEGORY_KEYS = { normal: "stream_category", member: "member_only_category" };
-
 // Title and scope are i18n templates, so a language switch re-renders them
 function renderMonthHeading(videoCount) {
     const title = document.getElementById("month-title");
