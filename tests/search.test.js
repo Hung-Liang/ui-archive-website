@@ -57,3 +57,7 @@ test("blank queries return nothing", () => {
         assert.deepEqual(searchIds(query), [], JSON.stringify(query));
     }
 });
+
+test("video dates use the site timezone", () => {
+    assert.equal(formatVideoDate("2025-07-31T15:30:00Z"), new Date(2025, 7, 1).toLocaleDateString());
+});
